@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>加須市周辺マップ</title>
+  <title>カテゴリ別マップ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -11,6 +11,24 @@
       height: 100%;
       margin: 0;
       padding: 0;
+    }
+    #map {
+      width: 100vw;
+      height: 100vh;
+    }
+    #filter-controls {
+      position: absolute;
+      top: 80px;
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    #filter-controls label {
+      display: block;
+      margin: 3px 0;
     }
   </style>
 </head>
@@ -370,7 +388,6 @@
         url: "https://www.dennys.jp/",
         image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqiXetdHyvrckZjwDrsfr_tN1yNO8y4UdGUw&s"
       },
-	 //ここから未編集
 	  {
         name: "Cafe&DINING BAR Tomoe",
         x: 845,
@@ -491,6 +508,7 @@
         y: 1660,
         hours: "17時00分～23時00分(火曜日定休)",
         parking: "あり",
+		phone: "なし",
         url: "https://www.shorinen.com/karin/",
         image: "https://www.jalan.net/jalan/img/9/kuchikomi/4309/KXL/80670_0004309454_1.JPG"
       },
