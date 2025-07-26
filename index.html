@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>加須市周辺マップ</title>
+  <title>カテゴリ別マップ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
@@ -44,13 +44,13 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		font-family: sans-serif;
+		font-family: noto-sans;
 	}
 	
-	@media (max-width: 1200px) {
+	@media (max-width: 800px) {
   #splash {
     background-position: center top, center bottom;
-    background-size: 500px auto, 500px auto;
+    background-size: 400px auto, 400px auto;
   }
 }
 
@@ -101,14 +101,37 @@
   }
 }
 
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* 画像間のスペース */
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+/* スマホ画面では縦並びに切り替え */
+@media (max-width: 600px) {
+  .logo-container {
+    flex-direction: column;
+  }
+  
+  .logo-container img {
+	width: 100px;
+  }
+}
+
   </style>
 </head>
 	<body>
 
 	<div id="splash">
 		<div id="splash-content">
-		<img src="daiichi_logo.png" alt="ロゴ" style="width: 221px; height: auto; margin-bottom: 20px;" class="slide-in">
-		<img src="center_logo.png" alt="ロゴ" style="width: 221px; height: auto; margin-bottom: 20px;" class="slide-from-left">
+		
+	    <div class="logo-container">
+			<img src="daiichi_logo.png" alt="第一ロゴ" class="slide-in">
+			<img src="center_logo.png" alt="センターロゴ" class="slide-from-left">
+		</div>
 		<h1 class="fade-in">ようこそ加須市へ</h1>
 		<p>Loading...</p>
 		</div>
