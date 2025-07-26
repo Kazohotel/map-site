@@ -30,9 +30,83 @@
       display: block;
       margin: 3px 0;
     }
+	#splash {
+		position: fixed;
+		top: 0; left: 0;
+		width: 100vw;
+		height: 100vh;
+		background-image: url('img_main_dai01.jpg'), url('img_main_cen01.jpg');
+		background-position: left center, right center;
+		background-repeat: no-repeat, no-repeat;
+		background-size: auto, auto;
+		background-color: white;
+		z-index: 9999;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-family: sans-serif;
+	}
+
+#splash {
+  text-align: center;
+  animation: fadeOut 1s ease 3s forwards; /* 3秒後にフェードアウト */
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.fade-in {
+  opacity: 0;
+  animation: fadeInOnly 1.5s ease-out 0.5s forwards;
+}
+
+@keyframes fadeInOnly {
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  opacity: 0;
+  transform: translateX(-50px);
+  animation: slideIn 1s ease-out forwards;
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.slide-from-left {
+  opacity: 0;
+  transform: translateX(50px); /* 左に50pxオフセット */
+  animation: slideInFromLeft 1s ease-out forwards;
+}
+
+@keyframes slideInFromLeft {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
   </style>
 </head>
-<body>
+	<body>
+
+	<div id="splash">
+		<div id="splash-content">
+		<img src="daiichi_logo.png" alt="ロゴ" style="width: 221px; height: auto; margin-bottom: 20px;" class="slide-in">
+		<img src="center_logo.png" alt="ロゴ" style="width: 221px; height: auto; margin-bottom: 20px;" class="slide-from-left">
+		<h1 class="fade-in">ようこそ加須市へ</h1>
+		<p>Loading...</p>
+		</div>
+	</div>
+
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -641,6 +715,11 @@
         .addTo(map)
         .bindPopup(popup);
     });
+	setTimeout(() => {
+		const splash = document.getElementById('splash');
+		splash.style.display = 'none';
+	}, 4000);  // 4秒後に非表示
+
   </script>
 </body>
 </html>
