@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>加須市周辺マップ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const mapWidth = 3510;
+    const mapHeight = 2482;
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -1,
+      maxZoom: 2,
+      zoomSnap: 0.1
+    });
+
+    const bounds = [[0, 0], [mapHeight, mapWidth]];
+    L.imageOverlay('mymap.png', bounds).addTo(map);
+    map.fitBounds(bounds);
+
+    // 複数アイコンの定義
+    const restaurantIcon = L.icon({
+      iconUrl: 'restaurant_icon.png',
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -42]
+    });
+
+    const shopIcon = L.icon({
+      iconUrl: 'shop_icon.png',
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -42]
+    });
+
+    const pharmacyIcon = L.icon({
+      iconUrl: 'pharmacy_icon.png',
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -42]
+    });
+	
+	const laundryIcon = L.icon({
+      iconUrl: 'laundry_icon.png',
+      iconSize: [32, 42],
+      iconAnchor: [16, 42],
+      popupAnchor: [0, -42]
+    });
+	
+    // ✅ お店の配列データ（ここにお店を増やす）
+	// {
+    //    name: "店名",
+    //    x: X座標,
+    //    y: Y座標,
+	//    type: お店のタイプ(restaurant,shop,laundry,pharmacy)
+    //    hours: "営業時間",
+    //    parking: "駐車場の有無",
+    //    phone: "xxxx-xx-xxxx",
+    //    url: "公式サイトのURL",
+    //    image: "店の写真のURL"
+    //  },
+    const shops = [
+      {
+        name: "れんがや",
+        x: 3009,
+        y: 521,
+        hours: "11時～21時（水曜日定休）",
+        parking: "あり",
+        phone: "0480-65-7468",
+        url: "https://www.lengaya.jp/",
+        image: "https://ximg.retty.me/crop/s400x400/q80/das/-/retty/img_repo/2l/01/5642264.jpg"
+      },
+      {
+        name: "シャトレーゼ 加須店",
+        x: 3097,
+        y: 986,
+        hours: "9時30分～20時30分",
+        parking: "あり",
+        phone: "0480-62-3330",
+        url: "https://www.chateraise.co.jp/ec/shop/o616104?utm_source=gmb&utm_medium=616104",
+		image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/3/5/6/75000000000000013653/0000028880/75000000000000013653_0000028880_1.jpg",
+      },
+      {
+        name: "鶴市",
+        x: 3000,
+        y: 1660,
+        hours: "17時00分～22時00分（水曜日定休）",
+        parking: "あり",
+        phone: "0480-65-5581",
+		image: "https://pbs.twimg.com/profile_images/813311588539060224/JIsL8Mqw_400x400.jpg",
+      },
+	  {
+        name: "洋菓子倶楽部エーデルワイス 花崎店",
+        x: 2911,
+        y: 1715,
+        hours: "11時00分～19時00分",
+        parking: "あり",
+        phone: "0480-65-7468",
+        url: "https://kuki-edelweiss.com/",
+        image: "https://jikomanpuku.com/wp-content/uploads/2025/02/IMG_8929-2.jpg"
+      },
+      {
+        name: "インド料理 シャゴル",
+        x: 2880,
+        y: 622,
+        hours: "11時00分～15時00分<br>17時00分～22時00分",
+        parking: "あり",
+        phone: "0480-65-9333",
+        url: "https://yzw3.ho-zuki.com/curry/",
+		image: "https://image.ekiten.jp/contribution/6907511/20230625205159_91174887.jpg",
+      },
+      {
+        name: "コナズ珈琲ビバモール加須",
+        x: 2445,
+        y: 2302,
+        hours: "9時00分～22時00分(土・日・祝)<br>10時00分～22時00分(平日)",
+        parking: "あり",
+        phone: "0480-65-5581",
+		image: "https://image.ekiten.jp/contribution/501919/20230522204806_77072698.JPG"
+      },
+	  {
+        name: "来集軒久下店",
+        x: 2740,
+        y: 702,
+        hours: "11時30分～14時15分<br>17時00分～19時00分(日・月曜日定休)",
+        parking: "あり",
+        phone: "0480-65-2752",
+        url: "http://www.utsugi-raisyuuken.com/index.html",
+        image: "http://www.utsugi-raisyuuken.com/_src/425/img20171023150751311018.jpg"
+      },
+	  {
+        name: "フライングガーデン 加須店",
+        x: 2709,
+        y: 383,
+        hours: "11時00分～22時00分",
+        parking: "あり",
+        phone: "0480-63-1811",
+        url: "http://www.fgarden.co.jp/",
+        image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/6/5/1/1060047156/0000028880/1060047156_0000028880_1.jpg"
+      },
+	  {
+        name: "PORTA FORTUNA（ポルタ フォルトゥーナ）",
+        x: 2660,
+        y: 344,
+        hours: "11時00分～20時00分",
+        parking: "あり",
+        phone: "0480-65-7468",
+        url: "https://www.instagram.com/portafortuna_2024/",
+        image: "https://hanamaru-kazo.com/common/image2.php?1=1&h=490&f=%2Fdb%5Fimg%2Fcl%5Fimg%2F434%2Fmain%5Fimg%5F2025021416272061%2Epng"
+      },
+      {
+        name: "ゆで太郎 もつ次郎 加須北小浜店",
+        x: 2582,
+        y: 425,
+        hours: "5時00分～23時00分",
+        parking: "あり",
+        phone: "0480-53-7221",
+        url: "http://www.yudetaro.jp/",
+		image: "https://ximg.retty.me/crop/s400x400/q80/das/-/retty/img_repo/2l/01/35921441.jpg",
+      },
+      {
+        name: "ステーキのどん 加須店",
+        x: 2505,
+        y: 428,
+        hours: "11時00分～23時30分",
+        parking: "あり",
+        phone: "0480-62-2170",
+		url: "https://www.steak-don.jp/shop_detail.html?snum=22",
+		image: "https://imgfp.hotp.jp/IMGH/00/87/P037870087/P037870087_480.jpg",
+      },
+	  {
+        name: "ケンタッキーフライドチキン加須店",
+        x: 2504,
+        y: 495,
+        hours: "10時00分～21時00分",
+        parking: "あり",
+        phone: "0480-63-1075",
+        url: "https://search.kfc.co.jp/map/1451",
+        image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/2/7/3/1060006372/0000004142/1060006372_0000004142_2.jpg"
+      },
+      {
+        name: "家族のイタリアン 集",
+        x: 2350,
+        y: 460,
+        hours: "11時00分～21時30分",
+        parking: "あり",
+        phone: "0480-53-9848",
+        url: "https://romantic-kaido.jp/shop/?id=shu",
+		image: "https://ximg.retty.me/crop/s400x400/q80/das/-/retty/img_repo/2l/01/34720569.jpg",
+      },
+      {
+        name: "韓風堂",
+        x: 2300,
+        y: 440,
+        hours: "11時00分～21時00分",
+        parking: "あり",
+        phone: "0480-63-2121",
+		image: "https://cdn.jalan.jp/jalan/img/9/kuchikomi/4089/KM/83349_0004089448_1.jpg"
+      },
+	  {
+        name: "がってん寿司 加須店",
+        x: 2200,
+        y: 510,
+        hours: "11時00分～21時00分",
+        parking: "あり",
+        phone: "0480-63-2121",
+		url: "https://www.rdcgroup.co.jp/gattenbrand/gatten/",
+		image: "https://cdn.jalan.jp/jalan/img/9/kuchikomi/4089/KM/83349_0004089448_1.jpg"
+      },
+	  {
+        name: "夢庵 加須店",
+        x: 2032,
+        y: 535,
+        hours: "10時00分～23時30分",
+        parking: "あり",
+        phone: "0570-014-008",
+        url: "https://www.skylark.co.jp/yumean/?utm_source=ym&utm_medium=gmb&utm_campaign=brandtop-Saitama",
+        image: "https://cdn.jalan.jp/jalan/img/2/kuchikomi/5152/KL/6e0a7_0005152374_1.jpeg"
+      },
+	  {
+        name: "ココス 加須店",
+        x: 1963,
+        y: 547,
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-63-1056",
+        url: "https://maps.cocos-jpn.co.jp/jp/detail/2610.html",
+        image: "https://tb-static.uber.com/prod/image-proc/processed_images/4f82c1b88a0572ce1c7b0dffd741d760/db809eadd12d21eb61044e0f3bf7c9b7.jpeg"
+      },
+	  {
+        name: "かつや 埼玉加須店",
+        x: 1360,
+        y: 214,
+        hours: "10時30分～22時30分",
+        parking: "あり",
+        phone: "0480-63-1811",
+        url: "https://shop.arclandservice.co.jp/ae-shop/spot/detail?code=433",
+        image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/5/7/3/75000000000000114375/0000021733/75000000000000114375_0000021733_4.jpg"
+      },
+	  {
+        name: "焼肉けむり",
+        x: 1323,
+        y: 158,
+        hours: "11時30分～22時00分(木曜日定休)",
+        parking: "あり",
+        phone: "0480-31-8849",
+        url: "http://www.kemuri.jp/",
+        image: "https://hanamaru-kazo.com/common/image2.php?1=1&w=1200&c=1&r=16,9&f=%2Fdb%5Fimg%2Ftopics%5Fimg%2F107%2Flist%5Fimage%5F20211102134057285%2Ejpeg"
+      },
+      {
+        name: "まつもと",
+        x: 1252,
+        y: 380,
+        hours: "5時00分～23時00分",
+        parking: "あり",
+        phone: "0480-62-6208",
+        url: "http://www.washoku-matsumoto.jp/",
+		image: "https://lh6.googleusercontent.com/proxy/izsqs4wSJcGVU-_w2UoNGaemb7nRvQFFpxUS30eF9y2UMDFTZzdyZIPNe1qYXvHX34X-PnyPxWzXTLRrfm1hUHul",
+      },
+      {
+        name: "ラーメン一代元 加須三俣店",
+        x: 1280,
+        y: 244,
+        hours: "11時00分～22時00分",
+        parking: "あり",
+        phone: "0480-62-2336",
+		image: "https://tblg.k-img.com/restaurant/images/Rvw/85037/640x640_rect_85037400.jpg",
+      },
+	  {
+        name: "とりあえず吾平 埼玉加須店",
+        x: 1019,
+        y: 125,
+        hours: "17時00分～0時00分",
+        parking: "あり",
+        phone: "0480-63-0311",
+        url: "https://r.gnavi.co.jp/1hw6tycx0000/?sc_lid=home_check_shop",
+        image: "https://rimage.gnst.jp/rest/img/1hw6tycx0000/s_0nlm.jpg?t=1572511291"
+      },
+      {
+        name: "しゃぶ葉 加須店",
+        x: 873,
+        y: 96,
+        hours: "11時00分～21時30分",
+        parking: "あり",
+        phone: "0480-63-1048",
+        url: "https://www.skylark.co.jp/syabuyo/?utm_source=ss&utm_medium=gmb&utm_campaign=brandtop-Saitama",
+		image: "https://ximg.retty.me/crop/s400x400/q80/das/-/retty/img_repo/2l/01/7241170.jpg",
+      },
+      {
+        name: "北海道生まれ和食処とんでん 加須店",
+        x: 1030,
+        y: 592,
+        hours: "11時00分～21時30分",
+        parking: "あり",
+        phone: "0480-62-3671",
+		url: "https://www.tonden.co.jp/shopsearch/saitama/kazo/",
+		image: "https://mesi-pero.com/wp-content/uploads/2025/01/IMG_5262.jpeg",
+      },
+	  {
+        name: "うどん酒房 たぬき",
+        x: 985,
+        y: 587,
+        hours: "10時15分～23時00分",
+        parking: "あり",
+        phone: "0480-63-0068",
+		url: "https://www.hotpepper.jp/strJ000169379/",
+		image: "https://udon-tanuki-takeout.com/dist/img/banquet4.jpg"
+      },
+	  {
+        name: "手打ちうどん・そば 子亀",
+        x: 350,
+        y: 545,
+        hours: "11時00分～14時30分<br>17時00分～19時30分(水曜日定休)",
+        parking: "あり",
+        phone: "0480-62-2876",
+        url: "http://www.kogame-udon.jp/",
+        image: "https://www.nishikawa1566.com/contents/nishikawa-chain/special/oichii/assets/img/img-kazo_udon/img-01.jpg"
+      },
+	  {
+        name: "デニーズ 加須店",
+        x: 295,
+        y: 543,
+        hours: "6時00分～0時00分",
+        parking: "あり",
+        phone: "080-3459-1729",
+        url: "https://www.dennys.jp/",
+        image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/7/9/2/1060007297/0000000137/1060007297_0000000137_8.jpg"
+      },
+	 {
+        name: "とん秀",
+        x: 824,
+        y: 838,
+        hours: "11時30分～15時00分<br>17時00分～21時00分",
+        parking: "あり",
+        phone: "0480-62-0473",
+		image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/7/3/8/14092710837/0000034479/14092710837_0000034479_2.jpg"
+      },
+	  {
+        name: "料亭さかもと",
+        x: 874,
+        y: 941,
+        hours: "20時00分～1時00分(日曜日定休)",
+        parking: "あり",
+        phone: "0480-62-6933",
+        url: "https://www.snakaranavi.net/shop.php?sno=8873",
+        image: "https://ryoutei-sakamoto.com/images/3500.jpg"
+      },
+	  {
+        name: "ぽえむ",
+        x: 730,
+        y: 930,
+        hours: "6時00分～0時00分(日曜日定休)",
+        parking: "あり",
+        phone: "080-3459-1729",
+        url: "https://www.dennys.jp/",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqiXetdHyvrckZjwDrsfr_tN1yNO8y4UdGUw&s"
+      },
+	 //ここから未編集
+	  {
+        name: "Cafe&DINING BAR Tomoe",
+        x: 845,
+        y: 1012,
+        hours: "11時30分～14時00分<br>17時30分～23時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-61-0155",
+        url: "https://kazo-tomoe.jimdofree.com/",
+        image: "https://stat.ameba.jp/user_images/20191008/06/wing000555/96/dd/j/o1080072014609601561.jpg"
+      },
+	  {
+        name: "純手打うどんそば 吉野屋本舗",
+        x: 648,
+        y: 1080,
+        hours: "11時00分～14時00分(火曜日定休)",
+        parking: "あり",
+        phone: "0480-61-0532",
+        image: "https://kazo-udon.jpn.org/_src/88061182/01-02.jpg?v=1741379181009"
+      },
+      {
+        name: "中華 かし亀",
+        x: 625,
+        y: 1127,
+        hours: "11時00分～14時00分<br>18時00分～19時30分(日曜日定休)",
+        parking: "あり",
+        phone: "0480-62-1408",
+        url: "https://www.instagram.com/kazo_kashikame_/",
+		image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/68/3e/photo0jpg.jpg?w=500&h=-1&s=1",
+      },
+	  {
+        name: "たけちゃん",
+        x: 617,
+        y: 1130,
+        hours: "17時00分～23時00分",
+        parking: "あり",
+        phone: "090-2313-0396",
+		image: "https://imgfp.hotp.jp/IMGH/80/02/P040938002/P040938002_480.jpg",
+      },
+      {
+        name: "らぁ麵屋 麓 加須",
+        x: 638,
+        y: 1263,
+        hours: "11時00分～14時30分<br>17時00分～1時30分",
+        parking: "あり",
+        phone: "0480-61-8666",
+		url: "https://www.instagram.com/ramenya_roku/",
+		image: "https://supleks.jp/img/stored/x92D2Q5Iza4Ou6siA8PlmMg6Y3WTtesq",
+      },
+	  {
+        name: "焼き鳥みくる",
+        x: 783,
+        y: 1185,
+        hours: "17時00分～0時00分(日曜日定休)",
+        parking: "あり",
+        phone: "080-9773-6900",
+        image: "https://hanamaru-kazo.com/common/image2.php?1=1&h=490&f=%2Fdb%5Fimg%2Fcl%5Fimg%2F439%2Fmain%5Fimg%5F20250528162856976%2Epng"
+      },
+      {
+        name: "うおのぶ",
+        x: 865,
+        y: 1194,
+        hours: "11時30分～23時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-61-0351",
+        url: "https://www.uonobu.net/",
+		image: "https://image.ekiten.jp/contribution/501675/20240330194743_66576716.jpg",
+      },
+      {
+        name: "炙りや 極味 総本店",
+        x: 805,
+        y: 1215,
+        hours: "11時00分～14時00分<br>17時00分～0時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-61-7788",
+		url: "https://www.hotpepper.jp/strJ003516148/",
+		image: "https://imgfp.hotp.jp/IMGH/32/64/P041363264/P041363264_480.jpg"
+      },
+	  {
+        name: "居酒屋 匠",
+        x: 955,
+        y: 1515,
+        hours: "16時00分～1時00分(土・日)<br>16時00分～0時00分(平日)",
+        parking: "あり",
+        phone: "0480-61-1246",
+		image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/8/5/3/00000000000080008358/0000003087/00000000000080008358_0000003087_1.jpg"
+      },
+	  {
+        name: "絶好調てらす家",
+        x: 955,
+        y: 1525,
+        hours: "17時00分～23時00分(金・土曜日以外定休)",
+        parking: "あり",
+        phone: "0480-48-7619",
+		url: "https://www.terasuya.com/",
+		image: "https://imgfp.hotp.jp/IMGH/15/49/P038151549/P038151549_480.jpg"
+      },
+	  {
+        name: "別邸ｰHANAREｰ",
+        x: 955,
+        y: 1545,
+        hours: "17時00分～0時00分(月・火曜日定休)",
+        parking: "あり",
+        phone: "0480-53-5993",
+        image: "https://stat.ameba.jp/user_images/20240511/21/yutasmama/f5/74/j/o1080108015437475142.jpg"
+      },
+	  {
+        name: "殿様キッチンハウス",
+        x: 958,
+        y: 1592,
+        hours: "17時30分～23時30分(日曜日定休)",
+        parking: "あり",
+        phone: "0480-61-3253",
+        image: "https://hanamaru-kazo.com/db_img/site_img/images/img_2021082415312452.jpg"
+      },
+	  {
+        name: "炭火焼肉かりん",
+        x: 1028,
+        y: 1660,
+        hours: "17時00分～23時00分(火曜日定休)",
+        parking: "あり",
+        url: "https://www.shorinen.com/karin/",
+        image: "https://www.jalan.net/jalan/img/9/kuchikomi/4309/KXL/80670_0004309454_1.JPG"
+      },
+	  {
+        name: "とみい",
+        x: 1288,
+        y: 956,
+        hours: "17時00分～22時30分",
+        parking: "あり",
+        phone: "0480-62-7998",
+        image: "https://imgfp.hotp.jp/IMGH/92/39/P041839239/P041839239_480.jpg"
+      },
+	  {
+        name: "佐渡",
+        x: 1545,
+        y: 909,
+        hours: "18時00分～1時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-61-0073",
+        image: "https://image.ekiten.jp/contribution/502313/20240505170115_50545266.jpg"
+      },
+      {
+        name: "彩加",
+        x: 1630,
+        y: 1070,
+        hours: "11時30分～14時00分<br>17時00分～23時00分",
+        parking: "あり",
+        phone: "0480-62-3883",
+        url: "http://www.washoku-matsumoto.jp/",
+		image: "https://tblg.k-img.com/restaurant/images/Rvw/307506/640x640_rect_6978a2bf9caf972ea100e364c5ab9708.jpg",
+      },
+      {
+        name: "とん平",
+        x: 1998,
+        y: 1110,
+        hours: "17時00分～23時00分",
+        parking: "あり",
+        phone: "0480-65-5303",
+		image: "https://tblg.k-img.com/restaurant/images/Rvw/121866/640x640_rect_121866988.jpg",
+      },
+	  {
+        name: "よしもと",
+        x: 2000,
+        y: 1185,
+        hours: "11時00分～14時30分",
+        parking: "あり",
+        phone: "0480-66-1122",
+        image: "https://ximg.retty.me/crop/s400x400/q80/das/-/retty/img_repo/2l/01/10339293.jpg"
+      },
+      {
+        name: "マサララソイ",
+        x: 1797,
+        y: 1229,
+        hours: "11時00分～14時30分<br>17時00分～21時30分",
+        parking: "あり",
+        phone: "0480-53-3959",
+		image: "https://tblg.k-img.com/restaurant/images/Rvw/62349/62349274.jpg",
+      },
+      {
+        name: "いちふく",
+        x: 1690,
+        y: 1399,
+        hours: "16時00分～0時00分",
+        parking: "あり",
+        phone: "0480-66-1291",
+		image: "https://tblg.k-img.com/restaurant/images/Rvw/218166/640x640_rect_47ee41f4f0cc92f3b42c3fdb30552fba.jpg",
+      },
+	  {
+        name: "手打そばうどん 久下屋脩兵衛",
+        x: 1723,
+        y: 1541,
+        hours: "11時00分～15時30分<br>17時30分～20時15分(火曜日定休)",
+        parking: "あり",
+        phone: "0480-65-5225",
+		url: "http://kugeya-s.com/",
+		image: "https://cdn.goope.jp/56848/170627223342kjcx_l.jpg"
+      },
+	  {
+        name: "こぶし",
+        x: 1857,
+        y: 1867,
+        hours: "11時00分～15時00分<br>17時00分～20時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-65-4611",
+        url: "https://kobushikazoshi.wixsite.com/mottocom",
+        image: "https://s1.spkimg.com/image/2016/08/11/19/4cuHV1Obt8twW8JzAC90vRifWdlPhm1N.jpg"
+      },
+	  {
+        name: "お気楽酒家どもん",
+        x: 950,
+        y: 1025,
+        hours: "17時30分～23時00分(日曜日臨時休業あり)",
+        parking: "あり",
+        phone: "0480-62-5300",
+        image: "https://www.apahotel.com/image/a1_9.jpg"
+      },
+	  {
+        name: "海鮮酒房せんりょう",
+        x: 785,
+        y: 1195,
+        hours: "17時30分～23時00分",
+        parking: "あり",
+        phone: "0480-61-8139",
+        image: "https://imgfp.hotp.jp/IMGH/62/57/P043426257/P043426257_480.jpg"
+      },
+	 //ここまで飲食店
+    ];
+
+    shops.forEach(shop => {
+      const y = mapHeight - shop.y;
+      const x = shop.x;
+
+      let icon = restaurantIcon;
+      if (shop.type === "shop") icon = shopIcon;
+	  if (shop.type === "laundry") icon = laundryIcon;
+      else if (shop.type === "pharmacy") icon = pharmacyIcon;
+
+      const popup = `
+        <b><h1>${shop.name}</h1></b><br>
+        ${shop.image ? `<img src="${shop.image}" width="200" height="200"><br>` : ""}
+        <div style="display: flex; align-items: flex-start;">
+          <span style="white-space: nowrap;"><strong>🕒 営業時間：</strong></span>
+          <span style="padding-left: 0.5em;">${shop.hours}</span>
+        </div>
+        <div><strong>🅿️ 駐車場：</strong>${shop.parking}</div>
+        <div><strong>☎️ 電話：</strong><a href="tel:${shop.phone}">${shop.phone}</a></div>
+        ${shop.url ? `<div><strong>🌐 </strong><a href="${shop.url}" target="_blank">公式サイトはこちら</a></div>` : ""}
+      `;
+
+      L.marker([y, x], { icon: icon })
+        .addTo(map)
+        .bindPopup(popup);
+    });
+  </script>
+</body>
+</html>
