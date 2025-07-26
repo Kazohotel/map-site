@@ -123,6 +123,28 @@
   }
 }
 
+/* 外側（Leafletマーカー本体）にはバウンスだけ */
+/* スケールだけ：アイコン外枠に与える */
+.marker-inner {
+  width: 32px;
+  height: 42px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.marker-inner.animate {
+  animation: scaleBounce 0.4s ease;
+  transform-origin: center bottom;
+}
+
+@keyframes scaleBounce {
+  0%   { transform: scale(1) translateY(0); }
+  30%  { transform: scale(1.6) translateY(-10px); }
+  60%  { transform: scale(1.2) translateY(5px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
   </style>
 </head>
 	<body>
@@ -158,33 +180,53 @@
     map.fitBounds(bounds);
 
     // 複数アイコンの定義
-    const restaurantIcon = L.icon({
-      iconUrl: 'restaurant_icon.png',
-      iconSize: [32, 42],
-      iconAnchor: [16, 42],
-      popupAnchor: [0, -42]
-    });
+    const restaurantIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+  html: '<div class="marker-inner" style="background-image: url(restaurant_icon.png);"></div>'
+});
 
-    const shopIcon = L.icon({
-      iconUrl: 'shop_icon.png',
-      iconSize: [32, 42],
-      iconAnchor: [16, 42],
-      popupAnchor: [0, -42]
-    });
+    const shopIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+  html: '<div class="marker-inner" style="background-image: url(shop_icon.png);"></div>'
+});
 
-    const pharmacyIcon = L.icon({
-      iconUrl: 'pharmacy_icon.png',
-      iconSize: [32, 42],
-      iconAnchor: [16, 42],
-      popupAnchor: [0, -42]
-    });
+    const pharmacyIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+  html: '<div class="marker-inner" style="background-image: url(pharmacy_icon.png);"></div>'
+});
 	
-	const laundryIcon = L.icon({
-      iconUrl: 'laundry_icon.png',
-      iconSize: [32, 42],
-      iconAnchor: [16, 42],
-      popupAnchor: [0, -42]
-    });
+	const laundryIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+  html: '<div class="marker-inner" style="background-image: url(laundry_icon.png);"></div>'
+});
+
+	const marketIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+  html: '<div class="marker-inner" style="background-image: url(market_icon.png);"></div>'
+});
+
+	const gsIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 42],
+  iconAnchor: [16, 42],
+  popupAnchor: [0, -42],
+  html: '<div class="marker-inner" style="background-image: url(gs_icon.png);"></div>'
+});
 	
     // ✅ お店の配列データ（ここにお店を増やす）
 	// {
@@ -719,7 +761,270 @@
         phone: "0480-61-8139",
         image: "https://imgfp.hotp.jp/IMGH/62/57/P043426257/P043426257_480.jpg"
       },
-	 //ここまで飲食店
+	 //↑ここまで飲食店	↓ここからコンビニ
+	  {
+        name: "セブン-イレブン 加須南篠崎２丁目店",
+        x: 2942,
+        y: 594,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-66-2271",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "ファミリーマート 加須久下店",
+        x: 3115,
+        y: 924,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-76-0180",
+        image: "https://www.fashionsnap.com/article/images/2024/03/familymart-wear-202403041-7aa06c70-7764-4acf-b33f-a2a3c390c1a1.png"
+      },
+	  {
+        name: "ローソン 加須花崎四丁目店",
+        x: 2945,
+        y: 1690,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-53-6639",
+        image: "https://logomarket.jp/labo/wp-content/uploads/2015/08/ee41502991024c1fcb472b58f4e38aea.png"
+      },
+	  {
+        name: "セブン-イレブン 加須北小浜店",
+        x: 1780,
+        y: 291,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-61-7711",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "セブン-イレブン 加須久下店",
+        x: 2100,
+        y: 823,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-65-5957",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "セブン-イレブン 加須久下南店",
+        x: 2041,
+        y: 1628,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-65-7577",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "セブン-イレブン 加須市役所前店",
+        x: 812,
+        y: 294,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-63-2022",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "セイコーマート 加須向川岸店",
+        x: 1134,
+        y: 640,
+	    type: "shop",
+        hours: "6時00分～23時00分",
+        parking: "あり",
+        phone: "0480-53-6112",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5l8Et4nuZmGeivOWL-r-EXCboKL2jK02yhw&s"
+      },
+	  {
+        name: "セブン-イレブン 加須南町店",
+        x: 1035,
+        y: 1757,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-62-5734",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "セブン-イレブン 加須大門町店",
+        x: 632,
+        y: 592,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-61-7717",
+        image: "https://play-lh.googleusercontent.com/EEX7U_o2Q9o4kjuo1j1IR4JCm6LO29BifTdi404TFFQxnQsB8sGFXONbTDC6Yko3iik"
+      },
+	  {
+        name: "ローソン 加須諏訪一丁目店",
+        x: 248,
+        y: 539,
+	    type: "shop",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: "https://logomarket.jp/labo/wp-content/uploads/2015/08/ee41502991024c1fcb472b58f4e38aea.png"
+      },
+	  //↑コンビニここまで	↓ここからスーパー
+	  {
+        name: "ベルク 加須久下店",
+        x: 2932,
+        y: 1240,
+	    type: "market",
+        hours: "9時00分～0時00分",
+        parking: "あり",
+        phone: "0480-76-3300",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfIcc1vmbXzD2t4jLwA8zrvwjPEszR9BCdMg&s"
+      },
+	  {
+        name: "生鮮＆業務スーパー加須ビバモール店",
+        x: 2514,
+        y: 2255,
+	    type: "market",
+        hours: "9時00分～21時00分",
+        parking: "あり",
+        phone: "0480-53-7695",
+        image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/8/3/7/75000000000000078738/0000028709/75000000000000078738_0000028709_2.jpg?f=400"
+      },
+	  {
+        name: "カスミ フードスクエア ビバモール加須店",
+        x: 2104,
+        y: 2375,
+	    type: "market",
+        hours: "9時00分～0時00分",
+        parking: "あり",
+        phone: "0480-67-0333",
+        image: "https://pbs.twimg.com/profile_images/1203833030441193473/18K6ytn9_400x400.jpg"
+      },
+	  {
+        name: "とりせん 加須浜町店",
+        x: 1876,
+        y: 693,
+	    type: "market",
+        hours: "9時00分～21時45分",
+        parking: "あり",
+        phone: "0480-61-4669",
+        image: "https://pbs.twimg.com/media/E2wsX8kUUAU-FKH.jpg:large"
+      },
+	  {
+        name: "ロヂャース 加須店",
+        x: 994,
+        y: 225,
+	    type: "market",
+        hours: "9時00分～21時30分(日曜日)<br>9時30分～21時30分(日曜日以外)",
+        parking: "あり",
+        phone: "0480-62-6307",
+        image: "https://smt.docomo.ne.jp/portal/dpoint/img/999999_540679_540680.png"
+      },
+	  {
+        name: "KAZO ケンゾー",
+        x: 940,
+        y: 630,
+	    type: "market",
+        hours: "9時00分～20時30分",
+        parking: "あり",
+        phone: "0480-61-0343",
+        image: "https://lh5.googleusercontent.com/proxy/Gva-R-xEXqo-I8NgbmD0t14GMJwHS_8JQkmZl7XnPBL54FaXXoVZDIrejddKekBUYuNZg9GK5zSbYXnpJHDnenZMBdks9NJjHlyH-Qm_KU-Ivdz3SgavKSgwIANNlcbMZiy1-MTp4sj1iGs"
+      },
+	  {
+        name: "ヤオコー 加須店",
+        x: 220,
+        y: 737,
+	    type: "market",
+        hours: "9時00分～21時45分",
+        parking: "あり",
+        phone: "0480-53-3114",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqNKcCynZt-5IQZVhXofbDUSkcmTIE46Qx6g&s"
+      },
+	  /*↑ここまでスーパー	↓ここから薬局
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  {
+        name: "",
+        x: ,
+        y: ,
+	    type: "pharmacy",
+        hours: "",
+        parking: "あり",
+        phone: "0480-62-7180",
+        image: ""
+      },
+	  */
     ];
 
     shops.forEach(shop => {
@@ -729,6 +1034,8 @@
       let icon = restaurantIcon;
       if (shop.type === "shop") icon = shopIcon;
 	  if (shop.type === "laundry") icon = laundryIcon;
+	  if (shop.type === "market") icon = marketIcon;
+	  if (shop.type === "gs") icon = gsIcon;
       else if (shop.type === "pharmacy") icon = pharmacyIcon;
 
       const popup = `
@@ -743,9 +1050,22 @@
         ${shop.url ? `<div><strong>🌐 </strong><a href="${shop.url}" target="_blank">公式サイトはこちら</a></div>` : ""}
       `;
 
-      L.marker([y, x], { icon: icon })
-        .addTo(map)
-        .bindPopup(popup);
+      const marker = L.marker([y, x], { icon: icon })
+  .addTo(map)
+  .bindPopup(popup);
+
+marker.on('click', () => {
+  const iconEl = marker.getElement();
+  const inner = iconEl?.querySelector('.marker-inner');
+  if (inner) {
+    inner.classList.add('animate');
+    setTimeout(() => {
+      inner.classList.remove('animate');
+    }, 400);
+  }
+});
+
+		
     });
 	setTimeout(() => {
 		const splash = document.getElementById('splash');
