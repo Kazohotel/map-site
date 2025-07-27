@@ -37,15 +37,37 @@
 }
 
 /* モバイル対応 */
-@media (max-width: 768px) {
-  #filter-options {
-    display: none;
+@media (min-width: 769px) {
+  #filter-controls {
+    top: 80px;
+    left: 10px;
+    bottom: auto;
+    right: auto;
+    width: auto;
+    background: white;
   }
+}
+@media (max-width: 768px) {
+  #filter-controls {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-width: none;
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  #toggle-filters {
+    width: 100%;
+    font-size: 16px;
+  }
+}
 
   #filter-controls.open #filter-options {
     display: block;
   }
-}
+  
     #filter-controls label {
       display: block;
       margin: 3px 0;
