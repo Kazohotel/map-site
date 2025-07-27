@@ -1267,14 +1267,17 @@
     shops.forEach(shop => {
       const y = mapHeight - shop.y;
       const x = shop.x;
+	  
+	  const type = (shop.type || "restaurant").toLowerCase();
 
 		let icon = restaurantIcon;
-		if (shop.type === "shop") icon = shopIcon;
-		if (shop.type === "laundry") icon = laundryIcon;
-		if (shop.type === "market") icon = marketIcon;
-		if (shop.type === "gs") icon = gsIcon;
-		if (shop.type === "pharmacy") icon = pharmacyIcon;
-
+		switch (type) {
+		case "shop": icon = shopIcon; break;
+		case "laundry": icon = laundryIcon; break;
+		case "market": icon = marketIcon; break;
+		case "gs": icon = gsIcon; break;
+		case "pharmacy": icon = pharmacyIcon; break;
+}
 
       const popup = `
         <b><h1>${shop.name}</h1></b><br>
@@ -1303,7 +1306,6 @@ marker.on('click', () => {
 });
 
 // アイコンタイプが未指定なら "restaurant" 扱い
-const type = (shop.type || "restaurant").toLowerCase();
 markerGroups[type].addLayer(marker);
 
 		
