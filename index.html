@@ -195,6 +195,9 @@
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol@0.81.0/dist/L.Control.Locate.min.css" />
+<script src="https://unpkg.com/leaflet.locatecontrol@0.81.0/dist/L.Control.Locate.min.js"></script>
   <script>
     const mapWidth = 3510;
     const mapHeight = 2482;
@@ -205,6 +208,18 @@
       maxZoom: 2,
       zoomSnap: 0.1
     });
+	L.control.locate({
+  position: 'topleft',  // ボタンの位置
+  setView: true,
+  flyTo: true,
+  strings: {
+    title: "📍 現在地を表示"
+  },
+  locateOptions: {
+    enableHighAccuracy: true
+  }
+}).addTo(map);
+
 	
 	const markerGroups = {
   restaurant: L.layerGroup().addTo(map),
