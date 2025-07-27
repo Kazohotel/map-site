@@ -160,6 +160,15 @@
 		<b class="fade-in">Welcome to KAZO City</b>
 		</div>
 	</div>
+	
+<div id="filter-controls">
+  <label><input type="checkbox" value="restaurant" checked> 飲食店</label>
+  <label><input type="checkbox" value="shop" checked> コンビニ</label>
+  <label><input type="checkbox" value="pharmacy" checked> 薬局</label>
+  <label><input type="checkbox" value="laundry" checked> ランドリー</label>
+  <label><input type="checkbox" value="market" checked> スーパー</label>
+  <label><input type="checkbox" value="gs" checked> ガソリンスタンド</label>
+</div>
 
   <div id="map"></div>
 
@@ -174,6 +183,15 @@
       maxZoom: 2,
       zoomSnap: 0.1
     });
+	
+	const markerGroups = {
+  restaurant: L.layerGroup().addTo(map),
+  shop: L.layerGroup().addTo(map),
+  pharmacy: L.layerGroup().addTo(map),
+  laundry: L.layerGroup().addTo(map),
+  market: L.layerGroup().addTo(map),
+  gs: L.layerGroup().addTo(map),
+};
 
     const bounds = [[0, 0], [mapHeight, mapWidth]];
     L.imageOverlay('mymap.png', bounds).addTo(map);
@@ -761,6 +779,44 @@
         phone: "0480-61-8139",
         image: "https://imgfp.hotp.jp/IMGH/62/57/P043426257/P043426257_480.jpg"
       },
+	  {
+        name: "もつ焼き 康",
+        x: 750,
+        y: 1330,
+        hours: "16時00分～22時30分(火曜日定休)",
+        parking: "あり",
+        phone: "0480-61-2939",
+        image: "https://imagedelivery.net/0Xfr734EZhL-f9btSNh4FQ/uploads/merchant/660f6943e93d0167043794.jpg/public"
+      },
+	   {
+        name: "焼肉ダイニング加須園",
+        x: 790,
+        y: 1165,
+        hours: "17時00分～23時00分(水曜日定休)",
+        parking: "あり",
+        phone: "0480-61-4197",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbuIQZJ2WDkR0phqCUwyxDEaIo8SXoT1KHug&s"
+      },
+	  {
+        name: "大衆酒場つなぐ家",
+        x: 1020,
+        y: 1156,
+        hours: "16時00分～23時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-31-9680",
+		url: "https://tsunaguya1101.com/",
+        image: "https://rimage.gnst.jp/rest/img/28y9zpjz0000/s_0n79.jpg?t=1547572813"
+      },
+	  {
+        name: "三勝",
+        x: 1086,
+        y: 1188,
+        hours: "11時00分～14時00分<br>17時00分～23時00分(月曜日定休)",
+        parking: "あり",
+        phone: "0480-61-1155",
+		url: "https://tsunaguya1101.com/",
+        image: "https://jice.homemate-research.com/pubuser1/pubuser_facility_img/0/5/2/14091105250/0000003087/14091105250_0000003087_3.jpg"
+      },
 	 //↑ここまで飲食店	↓ここからコンビニ
 	  {
         name: "セブン-イレブン 加須南篠崎２丁目店",
@@ -943,88 +999,189 @@
         phone: "0480-53-3114",
         image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqNKcCynZt-5IQZVhXofbDUSkcmTIE46Qx6g&s"
       },
-	  /*↑ここまでスーパー	↓ここから薬局
+	  //↑ここまでスーパー	↓ここから薬局
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "ドラッグストアコスモス 久下店",
+        x: 2625,
+        y: 1231,
 	    type: "pharmacy",
-        hours: "",
+        hours: "10時00分～21時00分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-53-9050",
+        image: "https://s-cuerno.com/wp-content/uploads/2024/10/ca9ccd0420504239b6d7a2a06ccc45a9.png"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "ウエルシア加須久下店",
+        x: 2195,
+        y: 854,
 	    type: "pharmacy",
-        hours: "",
+        hours: "9時00分～0時00分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-67-7003",
+        image: "https://wagasyade-saiyo.jp/picture/3b55057e10ac5391c5cf99a163ffb179244e5889.png"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "ドラッグストアコスモス 加須浜町店",
+        x: 1768,
+        y: 635,
 	    type: "pharmacy",
-        hours: "",
+        hours: "10時00分～21時00分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-53-5855",
+        image: "https://s-cuerno.com/wp-content/uploads/2024/10/ca9ccd0420504239b6d7a2a06ccc45a9.png"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "ドラッグストアセキ 加須店",
+        x: 1315,
+        y: 380,
 	    type: "pharmacy",
-        hours: "",
+        hours: "9時00分～23時00分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-62-8068",
+        image: "https://play-lh.googleusercontent.com/27QHNDwM2z7jYnB4cZ2qF4ATozQ7pr4XPWF4QrMVywHVnZr7CkTfxuzpffVfjdUd_y54"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "ドラッグセイムス 加須東栄店",
+        x: 1465,
+        y: 866,
 	    type: "pharmacy",
-        hours: "",
+        hours: "8時00分～21時45分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-63-1551",
+        image: "https://www.seims.co.jp/assets/img/service/img_brand.png"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "クスリのアオキ 久下店",
+        x: 1943,
+        y: 1615,
 	    type: "pharmacy",
-        hours: "",
+        hours: "9時00分～22時00分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-48-7446",
+        image: "https://public.muragon.com/7hlmbx05/mb7wjigh.jpg"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "カワチ薬局 加須調剤",
+        x: 1998,
+        y: 2277,
 	    type: "pharmacy",
-        hours: "",
+        hours: "9時00分～19時00分(日曜日定休)",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-7-3221",
+        image: "https://play-lh.googleusercontent.com/9oYNaP7Ol2tVWY4FsAJ097tcvQ6aQtDR7ca6katNf2IpOMiNFMrWRKAI1EIXtCQ5WfK0"
       },
 	  {
-        name: "",
-        x: ,
-        y: ,
+        name: "ウエルシア加須店",
+        x: 180,
+        y: 760,
 	    type: "pharmacy",
-        hours: "",
+        hours: "9時00分～23時00分",
         parking: "あり",
-        phone: "0480-62-7180",
-        image: ""
+        phone: "0480-63-0308",
+        image: "https://wagasyade-saiyo.jp/picture/3b55057e10ac5391c5cf99a163ffb179244e5889.png"
       },
-	  */
+	  //↑ここまで薬局	↓ここからランドリー
+	  {
+        name: "コインランドリー/ピエロ久下店",
+        x: 2968,
+        y: 702,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0120-172-480",
+        image: "https://laundry.senkaq.com/wp-content/uploads/2020/08/7ebdde47c19753fa2f84207203e1a215.jpg"
+      },
+	  {
+        name: "ランドリーカーサ とりせん加須浜町店",
+        x: 1836,
+        y: 612,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "03-6630-2632",
+        image: "https://laundream.com/wp-content/uploads/2017/06/7dbcf4f4e0137a0db2ea5fd7e6256603.jpg"
+      },
+	  {
+        name: "コインランドリー TipTop",
+        x: 1729,
+        y: 844,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-61-0221",
+        image: "https://blog.ikehikoshop.jp/wp-content/uploads/2021/09/coin.jpg"
+      },
+	  {
+        name: "コインランドリープードル",
+        x: 1970,
+        y: 1258,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "050-1460-8834",
+        image: "https://mikkemap.com/laundry/l-introduction/saitama/nuksxyre/img/img1.jpg"
+      },
+	  {
+        name: "コインランドリー 洗いまっせ 乾きまっせ",
+        x: 2329,
+        y: 2325,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "なし",
+        image: "https://storage.googleapis.com/imaimg/15185116075608_720x405.jpg"
+      },
+	  {
+        name: "しゃぼん 加須店",
+        x: 818,
+        y: 50,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "なし",
+        image: "https://www.reg.co.jp/_uploads/coin_laundry-kind1.png"
+      },
+	  {
+        name: "コインランドリー ドルフィン 加須店",
+        x: 720,
+        y: 600,
+	    type: "laundry",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "なし",
+        image: "https://pbs.twimg.com/media/EW5CVcoUMAAtoL_?format=jpg&name=large"
+      },
+	 //↑ここまでランドリー	↓ここからGS
+	 {
+        name: "ENEOS Dr.Driveセルフ花崎店",
+        x: 3021,
+        y: 1704,
+	    type: "gs",
+        hours: "24時間営業",
+        parking: "あり",
+        phone: "0480-65-6333",
+        image: "https://eneos-recruit.jp/rhp_root/static_contents/images/001/000413_223682.jpg"
+      },
+	  {
+        name: "丸紅エネルギー / (株)カトウコーポレーション セルフ加須西SS",
+        x: 1965,
+        y: 2480,
+	    type: "gs",
+        hours: "7時00分～21時00分",
+        parking: "あり",
+        phone: "0480-76-2070",
+        image: "https://d3rr6qn2571boz.cloudfront.net/images/rally/1199000142-1496050325.jpg"
+      },
+	  {
+        name: "apollostation セルフ加須市役所前SS",
+        x: 870,
+        y: 130,
+	    type: "gs",
+        hours: "4時00分～3時00分",
+        parking: "あり",
+        phone: "0480-61-8881",
+        image: "https://image.e-nenpi.com/gs_images/group8/52207/001thumb.jpg"
+      },
     ];
 
     shops.forEach(shop => {
@@ -1050,8 +1207,7 @@
         ${shop.url ? `<div><strong>🌐 </strong><a href="${shop.url}" target="_blank">公式サイトはこちら</a></div>` : ""}
       `;
 
-      const marker = L.marker([y, x], { icon: icon })
-  .addTo(map)
+const marker = L.marker([y, x], { icon: icon })
   .bindPopup(popup);
 
 marker.on('click', () => {
@@ -1065,12 +1221,28 @@ marker.on('click', () => {
   }
 });
 
+// アイコンタイプが未指定なら "restaurant" 扱い
+const type = shop.type || "restaurant";
+markerGroups[type].addLayer(marker);
+
 		
     });
 	setTimeout(() => {
 		const splash = document.getElementById('splash');
 		splash.style.display = 'none';
 	}, 4000);  // 4秒後に非表示
+
+document.querySelectorAll('#filter-controls input[type="checkbox"]').forEach(checkbox => {
+  checkbox.addEventListener('change', () => {
+    const type = checkbox.value;
+    const group = markerGroups[type];
+    if (checkbox.checked) {
+      group.addTo(map);
+    } else {
+      map.removeLayer(group);
+    }
+  });
+});
 
   </script>
 </body>
