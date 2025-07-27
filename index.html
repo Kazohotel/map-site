@@ -13,7 +13,7 @@
       padding: 0;
     }
     #map {
-      width: 100vw;
+      height: calc(100vh - 40px); /* フッターの高さ分を引く */
       height: 100vh;
     }
     #filter-controls {
@@ -163,6 +163,24 @@
   30%  { transform: scale(1.6) translateY(-10px); }
   60%  { transform: scale(1.2) translateY(5px); }
   100% { transform: scale(1) translateY(0); }
+}
+
+#map {
+  height: 100vh;
+}
+
+#copyright-notice {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  color: #666;
+  font-size: 12px;
+  text-align: center;
+  padding: 10px;
+  z-index: 1000;
+  box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
 }
 
   </style>
@@ -1335,6 +1353,9 @@ toggleBtn.addEventListener('click', () => {
   filterControls.classList.toggle('open');
 });
 
-  </script>
+  </script> 
+  <footer id="copyright-notice">
+    当サイトに掲載されているコンテンツの無断転載・複製・再配布を禁じます。 © 2025 Kazo Daiichi Hotel.
+  </footer>
 </body>
 </html>
