@@ -1267,6 +1267,13 @@ document.querySelectorAll('#filter-controls input[type="checkbox"]').forEach(che
   });
 });
 
+const toggleBtn = document.getElementById('toggle-filters');
+const filterControls = document.getElementById('filter-controls');
+
+toggleBtn.addEventListener('click', () => {
+  filterControls.classList.toggle('open');
+});
+
   </script>
 </body>
 </html>
