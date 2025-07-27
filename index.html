@@ -176,11 +176,17 @@
   width: 100%;
   background: white;
   color: #666;
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
   padding: 10px;
   z-index: 1000;
   box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+
+  /* 追加で入れるべきスタイル */
+  box-sizing: border-box;
+  white-space: normal;          /* テキストを折り返す */
+  overflow-wrap: break-word;    /* 長い単語で改行可能にする */
+  word-break: break-word;       /* 日本語も改行しやすく */
 }
 
   </style>
