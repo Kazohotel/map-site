@@ -1303,7 +1303,7 @@ marker.on('click', () => {
 });
 
 // アイコンタイプが未指定なら "restaurant" 扱い
-const type = shop.type || "restaurant";
+const type = (shop.type || "restaurant").toLowerCase();
 markerGroups[type].addLayer(marker);
 
 		
