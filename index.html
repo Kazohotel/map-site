@@ -30,48 +30,97 @@
 }
 
 /* 開閉ボタン */
-#toggle-filters {
-  width: 100%;
-  margin-bottom: 5px;
-  font-size: 16px;
+/* 共通設定 */
+#filter-controls {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+  z-index: 1000;
 }
 
-/* モバイル対応 */
-@media (min-width: 769px) {
-  #filter-controls {
-    top: 80px;
-    left: 10px;
-    bottom: auto;
-    right: auto;
-    width: auto;
-    background: white;
-  }
+#filter-controls label {
+  display: block;
+  margin: 6px 0;
+  font-size: 14px;
 }
+
+/* モバイル */
 @media (max-width: 768px) {
+  
   #filter-controls {
-    top: auto;
+    position: fixed;
     bottom: 10px;
     left: 10px;
-    right: 10px;
+    transform: none;
     width: auto;
-    max-width: none;
+    max-width: 200px;
+    min-width: 160px;
     background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 10px;
+    max-height: 50vh;
+    overflow-y: auto;
+    font-size: 13px;
+    margin: 4px 0;
   }
 
   #toggle-filters {
-    width: 100%;
-    font-size: 16px;
+    position: static;
+    display: block;
+    width: auto;
+    font-size: 14px;
+    padding: 6px 12px;
+    border: none;
+    background: #eaeaea;
+    border-radius: 8px;
+    margin: 0;
+    margin-bottom: 8px;
+  }
+
+  #filter-controls:not(.open) {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+  }
+
+  #filter-controls:not(.open) label {
+    display: none;
+  }
+
+  #filter-options {
+    display: none;
+  }
+  #filter-controls.open {
+    max-height: 21vh; 
+    overflow-y: auto; 
+  }
+
+  #filter-controls.open #filter-options {
+    display: block !important;
   }
 }
 
-  #filter-controls.open #filter-options {
+/* PC */
+@media (min-width: 769px) {
+  #filter-controls {
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    max-width: 180px;
+  }
+
+  #toggle-filters {
+    display: none;
+  }
+
+  #filter-options {
     display: block;
   }
-  
-    #filter-controls label {
-      display: block;
-      margin: 3px 0;
-    }
+}
 	#splash {
 		position: fixed;
 		top: 0; left: 0;
@@ -96,6 +145,10 @@
     background-repeat: no-repeat, no-repeat;
     background-size: 100% 50%, 100% 50%; /* 上下で半分ずつ表示 */
   }
+}
+
+#filter-controls.open #filter-options {
+  display: block;
 }
 
 #splash {
