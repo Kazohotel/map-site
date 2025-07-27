@@ -17,15 +17,34 @@
       height: 100vh;
     }
     #filter-controls {
-      position: absolute;
-      top: 80px;
-      left: 10px;
-      z-index: 1000;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 14px;
-    }
+  position: absolute;
+  top: 80px;
+  left: 10px;
+  z-index: 1000;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: 180px;
+}
+
+/* 開閉ボタン */
+#toggle-filters {
+  width: 100%;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  #filter-options {
+    display: none;
+  }
+
+  #filter-controls.open #filter-options {
+    display: block;
+  }
+}
     #filter-controls label {
       display: block;
       margin: 3px 0;
@@ -162,12 +181,15 @@
 	</div>
 	
 <div id="filter-controls">
-  <label><input type="checkbox" value="restaurant" checked> 飲食店</label>
-  <label><input type="checkbox" value="shop" checked> コンビニ</label>
-  <label><input type="checkbox" value="pharmacy" checked> 薬局</label>
-  <label><input type="checkbox" value="laundry" checked> ランドリー</label>
-  <label><input type="checkbox" value="market" checked> スーパー</label>
-  <label><input type="checkbox" value="gs" checked> ガソリンスタンド</label>
+  <button id="toggle-filters">フィルター</button>
+  <div id="filter-options">
+    <label><input type="checkbox" value="restaurant" checked> 飲食店</label>
+    <label><input type="checkbox" value="shop" checked> コンビニ</label>
+    <label><input type="checkbox" value="pharmacy" checked> 薬局</label>
+    <label><input type="checkbox" value="laundry" checked> ランドリー</label>
+    <label><input type="checkbox" value="market" checked> スーパー</label>
+    <label><input type="checkbox" value="gs" checked> ガソリンスタンド</label>
+  </div>
 </div>
 
   <div id="map"></div>
@@ -1188,12 +1210,13 @@
       const y = mapHeight - shop.y;
       const x = shop.x;
 
-      let icon = restaurantIcon;
-      if (shop.type === "shop") icon = shopIcon;
-	  if (shop.type === "laundry") icon = laundryIcon;
-	  if (shop.type === "market") icon = marketIcon;
-	  if (shop.type === "gs") icon = gsIcon;
-      else if (shop.type === "pharmacy") icon = pharmacyIcon;
+		let icon = restaurantIcon;
+		if (shop.type === "shop") icon = shopIcon;
+		if (shop.type === "laundry") icon = laundryIcon;
+		if (shop.type === "market") icon = marketIcon;
+		if (shop.type === "gs") icon = gsIcon;
+		if (shop.type === "pharmacy") icon = pharmacyIcon;
+
 
       const popup = `
         <b><h1>${shop.name}</h1></b><br>
