@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <title>加須市周辺マップ</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -362,7 +362,7 @@
         iconSize: [32, 42],
         iconAnchor: [16, 42],
         popupAnchor: [0, -42],
-        html: '<div class="marker-inner" style="background-image: url(restaurant_icon.png);"></div>',
+        html: '<div class="marker-inner" style="background-image: url(restaurant_icon.webp);"></div>',
       });
 
       const shopIcon = L.divIcon({
@@ -370,7 +370,7 @@
         iconSize: [32, 42],
         iconAnchor: [16, 42],
         popupAnchor: [0, -42],
-        html: '<div class="marker-inner" style="background-image: url(shop_icon.png);"></div>',
+        html: '<div class="marker-inner" style="background-image: url(shop_icon.webp);"></div>',
       });
 
       const pharmacyIcon = L.divIcon({
@@ -378,7 +378,7 @@
         iconSize: [32, 42],
         iconAnchor: [16, 42],
         popupAnchor: [0, -42],
-        html: '<div class="marker-inner" style="background-image: url(pharmacy_icon.png);"></div>',
+        html: '<div class="marker-inner" style="background-image: url(pharmacy_icon.webp);"></div>',
       });
 
       const laundryIcon = L.divIcon({
@@ -386,7 +386,7 @@
         iconSize: [32, 42],
         iconAnchor: [16, 42],
         popupAnchor: [0, -42],
-        html: '<div class="marker-inner" style="background-image: url(laundry_icon.png);"></div>',
+        html: '<div class="marker-inner" style="background-image: url(laundry_icon.webp);"></div>',
       });
 
       const marketIcon = L.divIcon({
@@ -394,7 +394,7 @@
         iconSize: [32, 42],
         iconAnchor: [16, 42],
         popupAnchor: [0, -42],
-        html: '<div class="marker-inner" style="background-image: url(market_icon.png);"></div>',
+        html: '<div class="marker-inner" style="background-image: url(market_icon.webp);"></div>',
       });
 
       const gsIcon = L.divIcon({
@@ -402,7 +402,7 @@
         iconSize: [32, 42],
         iconAnchor: [16, 42],
         popupAnchor: [0, -42],
-        html: '<div class="marker-inner" style="background-image: url(gs_icon.png);"></div>',
+        html: '<div class="marker-inner" style="background-image: url(gs_icon.webp);"></div>',
       });
 
       // ✅ お店の配列データ（ここにお店を増やす）
