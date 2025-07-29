@@ -1515,17 +1515,21 @@
     marker.shopType = type; // 種別を持たせておく
     marker.popupContent = popup;
 
-    marker.on("click", () => {
-      marker.bindPopup(popup).openPopup();
-      const iconEl = marker.getElement();
-      const inner = iconEl?.querySelector(".marker-inner");
-      if (inner) {
-        inner.style.transition = "transform 0.15s ease";
-        inner.style.transform = "scale(1.3)";
-        setTimeout(() => { inner.style.transform = "scale(0.90)"; }, 100);
-        setTimeout(() => { inner.style.transform = "scale(1)"; }, 200);
-      }
-    });
+    marker.bindPopup(popup);  // ← マーカー作成時に1回だけバインド
+
+marker.on("click", () => {
+  marker.closePopup();    // ← 念のため閉じる（同じピン再クリック用）
+  marker.openPopup();     // ← これだけで安定して開く！
+
+  const iconEl = marker.getElement();
+  const inner = iconEl?.querySelector(".marker-inner");
+  if (inner) {
+    inner.style.transition = "transform 0.15s ease";
+    inner.style.transform = "scale(1.3)";
+    setTimeout(() => { inner.style.transform = "scale(0.90)"; }, 100);
+    setTimeout(() => { inner.style.transform = "scale(1)"; }, 200);
+  }
+});
 
     allMarkers.push(marker);
   });
