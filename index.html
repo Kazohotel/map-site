@@ -22,7 +22,7 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        touch-action: none;
+        /*touch-action: none;*/
         overscroll-behavior: none;
         font-family: "Noto sans", sans-serif;
       }
@@ -243,6 +243,9 @@
           width: 200px;
         }
       }
+      .leaflet-marker-icon {
+        pointer-events: auto;
+      }
 
       .marker-inner {
         width: 32px;
@@ -250,6 +253,7 @@
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;
+        pointer-events: auto;
       }
 
       .marker-inner.animate {
@@ -335,6 +339,11 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+      // モバイルブラウザのピンチズームを防ぐ
+      document.addEventListener("gesturestart", function (e) {
+        e.preventDefault();
+      });
+
       const mapWidth = 3510;
       const mapHeight = 2482;
 
@@ -1542,14 +1551,14 @@
         const marker = L.marker([y, x], { icon: icon }).bindPopup(popup);
 
         marker.on("click", () => {
-  const iconEl = marker.getElement();
-  const inner = iconEl?.querySelector(".marker-inner");
-  if (inner) {
-    inner.classList.remove("animate"); // アニメ中でも一度リセット
-    void inner.offsetWidth; // DOM再計算でアニメ再実行を保証
-    inner.classList.add("animate");
-  }
-});
+          const iconEl = marker.getElement();
+          const inner = iconEl?.querySelector(".marker-inner");
+          if (inner) {
+            inner.classList.remove("animate"); // アニメ中でも一度リセット
+            void inner.offsetWidth; // DOM再計算でアニメ再実行を保証
+            inner.classList.add("animate");
+          }
+        });
 
         // アイコンタイプが未指定なら "restaurant" 扱い
         markerGroups[type].addLayer(marker);
@@ -1578,9 +1587,6 @@
 
       toggleBtn.addEventListener("click", () => {
         filterControls.classList.toggle("open");
-        document.addEventListener("gesturestart", function (e) {
-          e.preventDefault();
-        });
       });
     </script>
     <footer id="copyright-notice">
