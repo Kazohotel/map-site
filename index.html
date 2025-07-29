@@ -1541,15 +1541,14 @@
         const marker = L.marker([y, x], { icon: icon }).bindPopup(popup);
 
         marker.on("click", () => {
-          const iconEl = marker.getElement();
-          const inner = iconEl?.querySelector(".marker-inner");
-          if (inner) {
-            inner.classList.add("animate");
-            setTimeout(() => {
-              inner.classList.remove("animate");
-            }, 300);
-          }
-        });
+  const iconEl = marker.getElement();
+  const inner = iconEl?.querySelector(".marker-inner");
+  if (inner) {
+    inner.classList.remove("animate"); // アニメ中でも一度リセット
+    void inner.offsetWidth; // DOM再計算でアニメ再実行を保証
+    inner.classList.add("animate");
+  }
+});
 
         // アイコンタイプが未指定なら "restaurant" 扱い
         markerGroups[type].addLayer(marker);
