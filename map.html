@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>加須市周辺マップ</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overscroll-behavior: none;
+        font-family: "Noto Sans JP", sans-serif;
+        background-color: #f0f0f0;
+      }
+
+      #map {
+        height: 100vh;
+        width: 100vw;
+        z-index: 1;
+      }
+
+      /* -------------------------------------------
+         1. 画面上部のフィルター（PCとスマホで最適化）
+      ------------------------------------------- */
+      #top-filter-bar {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 800px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 768px) {
+        #top-filter-bar {
+          flex-wrap: nowrap;
+          justify-content: flex-start;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          border-radius: 30px;
+          padding: 10px;
+        }
+        #top-filter-bar::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      .filter-item {
+        flex-shrink: 0;
+      }
+
+      .filter-item input {
+        display: none;
+      }
+
+      .filter-item label {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #f8f9fa;
+        color: #555;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+        border: 1px solid #ddd;
+        white-space: nowrap;
+      }
+
+      .filter-item input:checked + label {
+        background-color: #0056b3;
+        color: white;
+        border-color: #0056b3;
+        box-shadow: 0 2px 8px rgba(0, 86, 179, 0.4);
+      }
+
+      /* -------------------------------------------
+         2. コンパクトになったボトムシート
+      ------------------------------------------- */
+      #bottom-sheet {
+        position: fixed;
+        bottom: -100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
+        transition: bottom 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        z-index: 2000;
+        box-sizing: border-box;
+      }
+
+      #bottom-sheet.active {
+        bottom: 0;
+      }
+
+      .sheet-handle {
+        width: 40px;
+        height: 5px;
+        background-color: #ddd;
+        border-radius: 3px;
+        margin: 12px auto;
+      }
+
+      #bs-content {
+        padding: 0 20px 20px 20px;
+      }
+
+      .shop-header {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 12px;
+      }
+
+      .shop-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        flex-shrink: 0;
+      }
+
+      .shop-title-area {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .shop-title {
+        color: #0056b3;
+        font-size: 1.15rem;
+        margin: 0 0 8px 0;
+        padding-right: 25px;
+        line-height: 1.3;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #f0f0f0;
+        border: none;
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+
+      .shop-info-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 4px;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        color: #444;
+      }
+
+      .shop-info-icon {
+        margin-right: 6px;
+        font-size: 0.9rem;
+      }
+
+      .button-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .shop-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 8px;
+        background: #fbbc04;
+        color: #333;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: bold;
+        flex: 1;
+        box-sizing: border-box;
+        font-size: 0.9rem;
+        transition: opacity 0.2s;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .google-btn {
+        background: #4285f4;
+        color: white;
+      }
+
+      .share-btn {
+        background: #06c755; /* LINEを意識した少し落ち着いた緑色 */
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      /* -------------------------------------------
+         3. 刷新したスプラッシュ画面（すりガラス調）
+      ------------------------------------------- */
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.8s ease;
+      }
+
+      .splash-bg-left,
+      .splash-bg-right {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        opacity: 0.15;
+        filter: grayscale(30%) blur(2px);
+      }
+      .splash-bg-left {
+        left: 0;
+        background-image: url("img_main_dai01.jpg");
+      }
+      .splash-bg-right {
+        right: 0;
+        background-image: url("img_main_cen01.jpg");
+      }
+
+      @media (max-width: 600px) {
+        .splash-bg-left {
+          width: 100%;
+          height: 50%;
+          bottom: auto;
+        }
+        .splash-bg-right {
+          width: 100%;
+          height: 50%;
+          top: auto;
+          left: 0;
+        }
+      }
+
+      #splash-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.85);
+        padding: 40px 50px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        animation: slideUpFade 1s ease-out forwards;
+      }
+
+      @keyframes slideUpFade {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .logo-container img {
+        max-width: 160px;
+        height: auto;
+      }
+      @media (max-width: 600px) {
+        .logo-container {
+          flex-direction: column;
+        }
+      }
+
+      .splash-title {
+        font-size: 1.4rem;
+        color: #0056b3;
+        margin: 10px 0 5px 0;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+      }
+      .splash-subtitle {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+        letter-spacing: 0.05em;
+      }
+
+      /* -------------------------------------------
+         4. ホテル（初期位置）に戻るボタン
+      ------------------------------------------- */
+      #reset-view-btn {
+        position: fixed;
+        bottom: 50px;
+        right: 20px;
+        background: #ffffff;
+        border: 2px solid #0056b3;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        z-index: 1500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 0;
+      }
+
+      #reset-view-btn:hover {
+        background: #f0f8ff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      #reset-view-btn:active {
+        transform: scale(0.9);
+      }
+
+      @media (max-width: 768px) {
+        #reset-view-btn {
+          bottom: 35px; /* コピーライトのすぐ上あたりに配置 */
+          right: 15px;
+          width: 50px;
+          height: 50px;
+          font-size: 24px;
+        }
+      }
+
+      /* その他 */
+      .marker-inner {
+        width: 32px;
+        height: 42px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        pointer-events: auto;
+      }
+      #copyright-notice {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.85);
+        color: #666;
+        font-size: 10px;
+        text-align: center;
+        padding: 4px 6px;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash">
+      <div class="splash-bg-left"></div>
+      <div class="splash-bg-right"></div>
+      <div id="splash-content">
+        <div class="logo-container">
+          <img src="daiichi_logo.png" alt="加須第一ホテル" />
+          <img src="center_logo.png" alt="加須センターホテル" />
+        </div>
+        <div class="splash-title">ようこそ加須市へ</div>
+        <div class="splash-subtitle">Welcome to KAZO City</div>
+      </div>
+    </div>
+
+    <div id="top-filter-bar">
+      <div class="filter-item">
+        <input
+          type="checkbox"
+          id="filter-restaurant"
+          value="restaurant"
+          checked
+        />
+        <label for="filter-restaurant">🍽️ 飲食店</label>
+      </div>
+      <div class="filter-item">
+        <input type="checkbox" id="filter-shop" value="shop" checked />
+        <label for="filter-shop">🏪 コンビニ</label>
+      </div>
+      <div class="filter-item">
+        <input type="checkbox" id="filter-pharmacy" value="pharmacy" checked />
+        <label for="filter-pharmacy">💊 薬局</label>
+      </div>
+      <div class="filter-item">
+        <input type="checkbox" id="filter-laundry" value="laundry" checked />
+        <label for="filter-laundry">🧺 ランドリー</label>
+      </div>
+      <div class="filter-item">
+        <input type="checkbox" id="filter-market" value="market" checked />
+        <label for="filter-market">🛒 スーパー</label>
+      </div>
+      <div class="filter-item">
+        <input type="checkbox" id="filter-gs" value="gs" checked />
+        <label for="filter-gs">⛽ ガソリンスタンド</label>
+      </div>
+    </div>
+
+    <div id="map"></div>
+
+    <button
+      id="reset-view-btn"
+      onclick="resetMapView()"
+      title="ホテルの位置に戻る"
+    >
+      🏨
+    </button>
+
+    <div id="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <button class="close-btn" onclick="closeBottomSheet()">✕</button>
+      <div id="bs-content"></div>
+    </div>
+
+    <footer id="copyright-notice">
+      当サイトに掲載されているコンテンツの無断転載・複製・再配布を禁じます。 ©
+      2026 Kazo Daiichi Hotel.
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <script>
+      function shareShop(name, url) {
+        const shareText = `加須第一ホテルの周辺マップで見つけました！\n「${name}」\n`;
+        const copyText = `おすすめのお店「${name}」\n${url}`;
+
+        if (navigator.share) {
+          // スマホの標準シェア機能を呼び出す
+          navigator
+            .share({
+              title: name,
+              text: shareText,
+              url: url,
+            })
+            .catch((error) => {
+              console.log("共有キャンセルまたは非対応", error);
+            });
+        } else {
+          // PC環境やシェア非対応ブラウザの場合のコピー機能
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard
+              .writeText(copyText)
+              .then(() => {
+                alert(
+                  "お店の情報をコピーしました！LINE等に貼り付けてください。",
+                );
+              })
+              .catch(() => {
+                // コピーも失敗した場合（ローカルテスト時など）の最終手段
+                prompt(
+                  "以下のテキストをコピーしてシェアしてください:",
+                  copyText,
+                );
+              });
+          } else {
+            prompt("以下のテキストをコピーしてシェアしてください:", copyText);
+          }
+        }
+      }
+      // スプラッシュ画面を自動でフェードアウトさせる処理
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const splash = document.getElementById("splash");
+          if (splash) {
+            splash.style.opacity = "0";
+            setTimeout(() => {
+              splash.style.display = "none";
+            }, 800);
+          }
+        }, 2000);
+      });
+
+      document.addEventListener("gesturestart", function (e) {
+        e.preventDefault();
+      });
+
+      const mapWidth = 3510;
+      const mapHeight = 2482;
+
+      // ✅ zoomControl: false を追加し、左上の＋/－ボタンを非表示にしました
+      const map = L.map("map", {
+        crs: L.CRS.Simple,
+        minZoom: -3,
+        maxZoom: 2,
+        zoomSnap: 0.5,
+        zoomDelta: 0.5,
+        tap: false,
+        zoomControl: false,
+      });
+
+      const bounds = [
+        [0, 0],
+        [mapHeight, mapWidth],
+      ];
+      L.imageOverlay("color maps_ver3.webp", bounds).addTo(map);
+      map.fitBounds(bounds);
+
+      map.on("click", closeBottomSheet);
+
+      // ✅ 指定したホテルの位置にズームしながら戻る関数
+      function resetMapView() {
+        closeBottomSheet();
+
+        // 【ここを変更】ホテルの画像上のピクセル座標（XとY）を入力してください
+        const hotelX = 774.7777; // ← 仮の数字です。実際のホテルのX座標に直してください
+        const hotelY = 1132.7918; // ← 仮の数字です。実際のホテルのY座標に直してください
+
+        // 【ここを変更】戻ったときのズームレベル（拡大率）です
+        // -3 が一番引いた状態で、0や0.5、1など数字を大きくするほど拡大されます
+        const zoomLevel = 0;
+
+        // Leaflet用にY座標を反転させて移動（durationは移動にかかる秒数です）
+        map.flyTo([mapHeight - hotelY, hotelX], zoomLevel, { duration: 0.5 });
+      }
+
+      const createCustomIcon = (iconUrl) => {
+        return L.divIcon({
+          className: "",
+          iconSize: [32, 42],
+          iconAnchor: [16, 42],
+          html: `<div class="marker-inner" style="background-image: url(${iconUrl});"></div>`,
+        });
+      };
+
+      const icons = {
+        restaurant: createCustomIcon("restaurant_icon.webp"),
+        shop: createCustomIcon("shop_icon.webp"),
+        pharmacy: createCustomIcon("pharmacy_icon.webp"),
+        laundry: createCustomIcon("laundry_icon.webp"),
+        market: createCustomIcon("market_icon.webp"),
+        gs: createCustomIcon("gs_icon.webp"),
+      };
+
+      const shops = [
+        {
+          name: "れんがや",
+          x: 3009,
+          y: 521,
+          type: "restaurant",
+          hours: "11時～21時（水曜日定休）",
+          parking: "あり",
+          phone: "0480-65-7468",
+          url: "https://www.lengaya.jp/",
+          image: "shopimg/rengaya.webp",
+        },
+        {
+          name: "シャトレーゼ 加須店",
+          x: 3097,
+          y: 986,
+          type: "restaurant",
+          hours: "9時30分～20時30分",
+          parking: "あり",
+          phone: "0480-62-3330",
+          url: "https://www.chateraise.co.jp/ec/shop/o616104?utm_source=gmb&utm_medium=616104",
+          image: "shopimg/chatraise.webp",
+        },
+        {
+          name: "鶴市",
+          x: 3000,
+          y: 1660,
+          type: "restaurant",
+          hours: "17時00分～22時00分（水曜日定休）",
+          parking: "あり",
+          phone: "0480-65-5581",
+          image: "shopimg/tsuruichi.webp",
+        },
+        {
+          name: "洋菓子倶楽部エーデルワイス 花崎店",
+          x: 2911,
+          y: 1715,
+          type: "restaurant",
+          hours: "11時00分～19時00分",
+          parking: "あり",
+          phone: "0480-65-7468",
+          url: "https://kuki-edelweiss.com/",
+          image: "shopimg/e-deruwaisu.webp",
+        },
+        {
+          name: "インド料理 シャゴル",
+          x: 2880,
+          y: 622,
+          type: "restaurant",
+          hours: "11時00分～15時00分<br>17時00分～22時00分",
+          parking: "あり",
+          phone: "0480-65-9333",
+          url: "https://yzw3.ho-zuki.com/curry/",
+          image: "shopimg/shagor.webp",
+        },
+        {
+          name: "コナズ珈琲ビバモール加須",
+          x: 2445,
+          y: 2302,
+          type: "restaurant",
+          hours: "9時00分～22時00分(土・日・祝)<br>10時00分～22時00分(平日)",
+          parking: "あり",
+          phone: "0480-65-5581",
+          image: "shopimg/konascoffee.webp",
+        },
+        {
+          name: "来集軒久下店",
+          x: 2740,
+          y: 702,
+          type: "restaurant",
+          hours: "11時30分～14時15分<br>17時00分～19時00分(日・月曜日定休)",
+          parking: "あり",
+          phone: "0480-65-2752",
+          url: "http://www.utsugi-raisyuuken.com/index.html",
+          image: "shopimg/raishuukenn.webp",
+        },
+        {
+          name: "フライングガーデン 加須店",
+          x: 2709,
+          y: 383,
+          type: "restaurant",
+          hours: "11時00分～22時00分",
+          parking: "あり",
+          phone: "0480-63-1811",
+          url: "http://www.fgarden.co.jp/",
+          image: "shopimg/flyinggarden.webp",
+        },
+        {
+          name: "PORTA FORTUNA（ポルタ フォルトゥーナ）",
+          x: 2660,
+          y: 344,
+          type: "restaurant",
+          hours: "11時00分～20時00分",
+          parking: "あり",
+          phone: "0480-65-7468",
+          url: "https://www.instagram.com/portafortuna_2024/",
+          image: "shopimg/portafortuna.webp",
+        },
+        {
+          name: "ゆで太郎 もつ次郎 加須北小浜店",
+          x: 2582,
+          y: 425,
+          type: "restaurant",
+          hours: "5時00分～23時00分",
+          parking: "あり",
+          phone: "0480-53-7221",
+          url: "http://www.yudetaro.jp/",
+          image: "shopimg/yudetarou.webp",
+        },
+        {
+          name: "ステーキのどん 加須店",
+          x: 2505,
+          y: 428,
+          type: "restaurant",
+          hours: "11時00分～23時30分",
+          parking: "あり",
+          phone: "0480-62-2170",
+          url: "https://www.steak-don.jp/shop_detail.html?snum=22",
+          image: "shopimg/steakdon.webp",
+        },
+        {
+          name: "ケンタッキーフライドチキン加須店",
+          x: 2504,
+          y: 495,
+          type: "restaurant",
+          hours: "10時00分～21時00分",
+          parking: "あり",
+          phone: "0480-63-1075",
+          url: "https://search.kfc.co.jp/map/1451",
+          image: "shopimg/KFC.webp",
+        },
+        {
+          name: "家族のイタリアン 集",
+          x: 2350,
+          y: 460,
+          type: "restaurant",
+          hours: "11時00分～21時30分",
+          parking: "あり",
+          phone: "0480-53-9848",
+          url: "https://romantic-kaido.jp/shop/?id=shu",
+          image: "shopimg/shuu.webp",
+        },
+        {
+          name: "韓風堂",
+          x: 2300,
+          y: 440,
+          type: "restaurant",
+          hours: "11時00分～21時00分",
+          parking: "あり",
+          phone: "0480-63-2121",
+          image: "shopimg/kanpuudou.webp",
+        },
+        {
+          name: "がってん寿司 加須店",
+          x: 2200,
+          y: 510,
+          type: "restaurant",
+          hours: "11時00分～21時00分",
+          parking: "あり",
+          phone: "0480-63-2121",
+          url: "https://www.rdcgroup.co.jp/gattenbrand/gatten/",
+          image: "shopimg/gattennsusi.webp",
+        },
+        {
+          name: "夢庵 加須店",
+          x: 2032,
+          y: 535,
+          type: "restaurant",
+          hours: "10時00分～23時30分",
+          parking: "あり",
+          phone: "0570-014-008",
+          url: "https://www.skylark.co.jp/yumean/?utm_source=ym&utm_medium=gmb&utm_campaign=brandtop-Saitama",
+          image: "shopimg/yumean.webp",
+        },
+        {
+          name: "ココス 加須店",
+          x: 1963,
+          y: 547,
+          type: "restaurant",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-63-1056",
+          url: "https://maps.cocos-jpn.co.jp/jp/detail/2610.html",
+          image: "shopimg/kokos.webp",
+        },
+        {
+          name: "かつや 埼玉加須店",
+          x: 1360,
+          y: 214,
+          type: "restaurant",
+          hours: "10時30分～22時30分",
+          parking: "あり",
+          phone: "0480-63-1811",
+          url: "https://shop.arclandservice.co.jp/ae-shop/spot/detail?code=433",
+          image: "shopimg/katsuya.webp",
+        },
+        {
+          name: "焼肉けむり",
+          x: 1323,
+          y: 158,
+          type: "restaurant",
+          hours: "11時30分～22時00分(木曜日定休)",
+          parking: "あり",
+          phone: "0480-31-8849",
+          url: "http://www.kemuri.jp/",
+          image: "shopimg/kemuri.webp",
+        },
+        {
+          name: "まつもと",
+          x: 1252,
+          y: 380,
+          type: "restaurant",
+          hours: "5時00分～23時00分",
+          parking: "あり",
+          phone: "0480-62-6208",
+          url: "http://www.washoku-matsumoto.jp/",
+          image: "shopimg/matsumoto.webp",
+        },
+        {
+          name: "ラーメン一代元 加須三俣店",
+          x: 1280,
+          y: 244,
+          type: "restaurant",
+          hours: "11時00分～22時00分",
+          parking: "あり",
+          phone: "0480-62-2336",
+          image: "shopimg/ichidaigenn.webp",
+        },
+        {
+          name: "とりあえず吾平 埼玉加須店",
+          x: 1019,
+          y: 125,
+          type: "restaurant",
+          hours: "17時00分～0時00分",
+          parking: "あり",
+          phone: "0480-63-0311",
+          url: "https://r.gnavi.co.jp/1hw6tycx0000/?sc_lid=home_check_shop",
+          image: "shopimg/toriaezugohei.webp",
+        },
+        {
+          name: "しゃぶ葉 加須店",
+          x: 873,
+          y: 96,
+          type: "restaurant",
+          hours: "11時00分～21時30分",
+          parking: "あり",
+          phone: "0480-63-1048",
+          url: "https://www.skylark.co.jp/syabuyo/?utm_source=ss&utm_medium=gmb&utm_campaign=brandtop-Saitama",
+          image: "shopimg/shabuyou.webp",
+        },
+        {
+          name: "北海道生まれ和食処とんでん 加須店",
+          x: 1030,
+          y: 592,
+          type: "restaurant",
+          hours: "11時00分～21時30分",
+          parking: "あり",
+          phone: "0480-62-3671",
+          url: "https://www.tonden.co.jp/shop/22",
+          image: "shopimg/tonden.webp",
+        },
+        {
+          name: "うどん酒房 たぬき",
+          x: 985,
+          y: 587,
+          type: "restaurant",
+          hours: "10時15分～23時00分",
+          parking: "あり",
+          phone: "0480-63-0068",
+          url: "https://www.udon-tanuki.com/",
+          image: "shopimg/tanuki.webp",
+        },
+        {
+          name: "手打ちうどん・そば 子亀",
+          x: 350,
+          y: 545,
+          type: "restaurant",
+          hours: "11時00分～14時30分<br>17時00分～19時30分(水曜日定休)",
+          parking: "あり",
+          phone: "0480-62-2876",
+          url: "http://www.kogame-udon.jp/",
+          image: "shopimg/kogame.webp",
+        },
+        {
+          name: "デニーズ 加須店",
+          x: 295,
+          y: 543,
+          type: "restaurant",
+          hours: "6時00分～0時00分",
+          parking: "あり",
+          phone: "080-3459-1729",
+          url: "https://www.dennys.jp/",
+          image: "shopimg/dannys.webp",
+        },
+        {
+          name: "とん秀",
+          x: 824,
+          y: 838,
+          type: "restaurant",
+          hours: "11時30分～15時00分<br>17時00分～21時00分",
+          parking: "あり",
+          phone: "0480-62-0473",
+          image: "shopimg/tonnhide.webp",
+        },
+        {
+          name: "料亭さかもと",
+          x: 874,
+          y: 941,
+          type: "restaurant",
+          hours: "20時00分～1時00分(日曜日定休)",
+          parking: "あり",
+          phone: "0480-62-6933",
+          url: "http://ryoutei-sakamoto.com/",
+          image: "shopimg/sakamoto.webp",
+        },
+        {
+          name: "ぽえむ",
+          x: 730,
+          y: 930,
+          type: "restaurant",
+          hours: "6時00分～0時00分(日曜日定休)",
+          parking: "あり",
+          phone: "080-3459-1729",
+          url: "https://www.snakaranavi.net/shop.php?sno=8873",
+          image: "shopimg/poemu.webp",
+        },
+        {
+          name: "Cafe&DINING BAR Tomoe",
+          x: 845,
+          y: 1012,
+          type: "restaurant",
+          hours: "11時30分～14時00分<br>17時30分～23時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-61-0155",
+          url: "https://kazo-tomoe.jimdofree.com/",
+          image: "shopimg/tomoe.webp",
+        },
+        {
+          name: "純手打うどんそば 吉野屋本舗",
+          x: 648,
+          y: 1080,
+          type: "restaurant",
+          hours: "11時00分～14時00分(火曜日定休)",
+          parking: "あり",
+          phone: "0480-61-0532",
+          image: "shopimg/yoshinoya.webp",
+        },
+        {
+          name: "中華 かし亀",
+          x: 625,
+          y: 1127,
+          type: "restaurant",
+          hours: "11時00分～14時00分<br>18時00分～19時30分(日曜日定休)",
+          parking: "あり",
+          phone: "0480-62-1408",
+          url: "https://www.instagram.com/kazo_kashikame_/",
+          image: "shopimg/kasikame.webp",
+        },
+        {
+          name: "たけちゃん",
+          x: 617,
+          y: 1130,
+          type: "restaurant",
+          hours: "17時00分～23時00分",
+          parking: "あり",
+          phone: "090-2313-0396",
+          image: "shopimg/takechan.webp",
+        },
+        {
+          name: "らぁ麵屋 麓 加須",
+          x: 638,
+          y: 1263,
+          type: "restaurant",
+          hours: "11時00分～14時30分<br>17時00分～1時30分",
+          parking: "あり",
+          phone: "0480-61-8666",
+          url: "https://www.instagram.com/ramenya_roku/",
+          image: "shopimg/ramenroku.webp",
+        },
+        {
+          name: "焼き鳥みくる",
+          x: 783,
+          y: 1185,
+          type: "restaurant",
+          hours: "17時00分～0時00分(日曜日定休)",
+          parking: "あり",
+          phone: "080-9773-6900",
+          image: "shopimg/mikuru.webp",
+        },
+        {
+          name: "うおのぶ",
+          x: 865,
+          y: 1194,
+          type: "restaurant",
+          hours: "11時30分～23時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-61-0351",
+          url: "https://www.uonobu.net/",
+          image: "shopimg/uonobu.webp",
+        },
+        {
+          name: "炙りや 極味 総本店",
+          x: 805,
+          y: 1215,
+          type: "restaurant",
+          hours: "11時00分～14時00分<br>17時00分～0時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-61-7788",
+          url: "https://www.hotpepper.jp/strJ003516148/",
+          image: "shopimg/kiwami.webp",
+        },
+        {
+          name: "居酒屋 匠",
+          x: 955,
+          y: 1515,
+          type: "restaurant",
+          hours: "16時00分～1時00分(土・日)<br>16時00分～0時00分(平日)",
+          parking: "あり",
+          phone: "0480-61-1246",
+          image: "shopimg/takumi.webp",
+        },
+        {
+          name: "絶好調てらす家",
+          x: 955,
+          y: 1525,
+          type: "restaurant",
+          hours: "17時00分～23時00分(金・土曜日以外定休)",
+          parking: "あり",
+          phone: "0480-48-7619",
+          url: "https://www.terasuya.com/",
+          image: "shopimg/terasuya.webp",
+        },
+        {
+          name: "別邸ｰHANAREｰ",
+          x: 955,
+          y: 1545,
+          type: "restaurant",
+          hours: "17時00分～0時00分(月・火曜日定休)",
+          parking: "あり",
+          phone: "0480-53-5993",
+          image: "shopimg/hanare.webp",
+        },
+        {
+          name: "殿様キッチンハウス",
+          x: 958,
+          y: 1592,
+          type: "restaurant",
+          hours: "17時30分～23時30分(日曜日定休)",
+          parking: "あり",
+          phone: "0480-61-3253",
+          image: "shopimg/tonosama.webp",
+        },
+        {
+          name: "炭火焼肉かりん",
+          x: 1028,
+          y: 1660,
+          type: "restaurant",
+          hours: "17時00分～23時00分(火曜日定休)",
+          parking: "あり",
+          phone: "なし",
+          url: "https://www.shorinen.com/karin/",
+          image: "shopimg/karin.webp",
+        },
+        {
+          name: "とみい",
+          x: 1288,
+          y: 956,
+          type: "restaurant",
+          hours: "17時00分～22時30分",
+          parking: "あり",
+          phone: "0480-62-7998",
+          image: "shopimg/tomii.webp",
+        },
+        {
+          name: "佐渡",
+          x: 1545,
+          y: 909,
+          type: "restaurant",
+          hours: "18時00分～1時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-61-0073",
+          image: "shopimg/sado.webp",
+        },
+        {
+          name: "彩加",
+          x: 1630,
+          y: 1070,
+          type: "restaurant",
+          hours: "11時30分～14時00分<br>17時00分～23時00分",
+          parking: "あり",
+          phone: "0480-62-3883",
+          image: "shopimg/saika.webp",
+        },
+        {
+          name: "とん平",
+          x: 1998,
+          y: 1110,
+          type: "restaurant",
+          hours: "17時00分～23時00分",
+          parking: "あり",
+          phone: "0480-65-5303",
+          image: "shopimg/tonnpei.webp",
+        },
+        {
+          name: "よしもと",
+          x: 2000,
+          y: 1185,
+          type: "restaurant",
+          hours: "11時00分～14時30分",
+          parking: "あり",
+          phone: "0480-66-1122",
+          image: "shopimg/yoshimoto.webp",
+        },
+        {
+          name: "マサララソイ",
+          x: 1797,
+          y: 1229,
+          type: "restaurant",
+          hours: "11時00分～14時30分<br>17時00分～21時30分",
+          parking: "あり",
+          phone: "0480-53-3959",
+          image: "shopimg/masalarasoi.webp",
+        },
+        {
+          name: "いちふく",
+          x: 1690,
+          y: 1399,
+          type: "restaurant",
+          hours: "16時00分～0時00分",
+          parking: "あり",
+          phone: "0480-66-1291",
+          image: "shopimg/ichihuku.webp",
+        },
+        {
+          name: "手打そばうどん 久下屋脩兵衛",
+          x: 1723,
+          y: 1541,
+          type: "restaurant",
+          hours: "11時00分～15時30分<br>17時30分～20時15分(火曜日定休)",
+          parking: "あり",
+          phone: "0480-65-5225",
+          url: "http://kugeya-s.com/",
+          image: "shopimg/kugeyashuubei.webp",
+        },
+        {
+          name: "こぶし",
+          x: 1857,
+          y: 1867,
+          type: "restaurant",
+          hours: "11時00分～15時00分<br>17時00分～20時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-65-4611",
+          url: "https://kobushikazoshi.wixsite.com/mottocom",
+          image: "shopimg/kobushi.webp",
+        },
+        {
+          name: "お気楽酒家どもん",
+          x: 950,
+          y: 1025,
+          type: "restaurant",
+          hours: "17時30分～23時00分(日曜日臨時休業あり)",
+          parking: "あり",
+          phone: "0480-62-5300",
+          url: "https://www.kazo.co.jp/daiichi/restaurant/",
+          image: "shopimg/domon.webp",
+        },
+        {
+          name: "海鮮酒房せんりょう",
+          x: 785,
+          y: 1195,
+          type: "restaurant",
+          hours: "17時30分～23時00分",
+          parking: "あり",
+          phone: "0480-61-8139",
+          url: "https://www.kazo.co.jp/center/restaurant/",
+          image: "shopimg/senryou.webp",
+        },
+        {
+          name: "もつ焼き 康",
+          x: 750,
+          y: 1330,
+          type: "restaurant",
+          hours: "16時00分～22時30分(火曜日定休)",
+          parking: "あり",
+          phone: "0480-61-2939",
+          image: "shopimg/yasu.webp",
+        },
+        {
+          name: "焼肉ダイニング加須園",
+          x: 790,
+          y: 1165,
+          type: "restaurant",
+          hours: "17時00分～23時00分(水曜日定休)",
+          parking: "あり",
+          phone: "0480-61-4197",
+          image: "shopimg/kazoen.webp",
+        },
+        {
+          name: "大衆酒場つなぐ家",
+          x: 1020,
+          y: 1156,
+          type: "restaurant",
+          hours: "16時00分～23時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-31-9680",
+          url: "https://tsunaguya1101.com/",
+          image: "shopimg/tunaguya.webp",
+        },
+        {
+          name: "三勝",
+          x: 1086,
+          y: 1188,
+          type: "restaurant",
+          hours: "11時00分～14時00分<br>17時00分～23時00分(月曜日定休)",
+          parking: "あり",
+          phone: "0480-61-1155",
+          image: "shopimg/sannkatsu.webp",
+        },
+        {
+          name: "セブン-イレブン 加須南篠崎２丁目店",
+          x: 2942,
+          y: 594,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-66-2271",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "ファミリーマート 加須駅北口店",
+          x: 710,
+          y: 1335,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "なし",
+          phone: "0480-53-3745",
+          image: "shopimg/familymart.webp",
+        },
+        {
+          name: "ファミリーマート 加須久下店",
+          x: 3115,
+          y: 924,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-76-0180",
+          image: "shopimg/familymart.webp",
+        },
+        {
+          name: "ローソン 加須花崎四丁目店",
+          x: 2945,
+          y: 1690,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-53-6639",
+          image: "shopimg/lawson.webp",
+        },
+        {
+          name: "セブン-イレブン 加須北小浜店",
+          x: 1780,
+          y: 291,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-61-7711",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "セブン-イレブン 加須久下店",
+          x: 2100,
+          y: 823,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-65-5957",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "セブン-イレブン 加須久下南店",
+          x: 2041,
+          y: 1628,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-65-7577",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "セブン-イレブン 加須市役所前店",
+          x: 812,
+          y: 294,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-63-2022",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "セイコーマート 加須向川岸店",
+          x: 1134,
+          y: 640,
+          type: "shop",
+          hours: "6時00分～23時00分",
+          parking: "あり",
+          phone: "0480-53-6112",
+          image: "shopimg/seiko-mart.webp",
+        },
+        {
+          name: "セブン-イレブン 加須南町店",
+          x: 1035,
+          y: 1757,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-62-5734",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "セブン-イレブン 加須大門町店",
+          x: 632,
+          y: 592,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-61-7717",
+          image: "shopimg/seveneleven.webp",
+        },
+        {
+          name: "ローソン 加須諏訪一丁目店",
+          x: 248,
+          y: 539,
+          type: "shop",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-62-7180",
+          image: "shopimg/lawson.webp",
+        },
+        {
+          name: "ベルク 加須久下店",
+          x: 2932,
+          y: 1240,
+          type: "market",
+          hours: "9時00分～0時00分",
+          parking: "あり",
+          phone: "0480-76-3300",
+          image: "shopimg/belc.webp",
+        },
+        {
+          name: "生鮮＆業務スーパー加須ビバモール店",
+          x: 2514,
+          y: 2255,
+          type: "market",
+          hours: "9時00分～21時00分",
+          parking: "あり",
+          phone: "0480-53-7695",
+          image: "shopimg/gyoumusuper.webp",
+        },
+        {
+          name: "カスミ フードスクエア ビバモール加須店",
+          x: 2104,
+          y: 2375,
+          type: "market",
+          hours: "9時00分～0時00分",
+          parking: "あり",
+          phone: "0480-67-0333",
+          image: "shopimg/kasumi.webp",
+        },
+        {
+          name: "とりせん 加須浜町店",
+          x: 1876,
+          y: 693,
+          type: "market",
+          hours: "9時00分～21時45分",
+          parking: "あり",
+          phone: "0480-61-4669",
+          image: "shopimg/torisen.webp",
+        },
+        {
+          name: "ロヂャース 加須店",
+          x: 994,
+          y: 225,
+          type: "market",
+          hours: "9時00分～21時30分(日曜日)<br>9時30分～21時30分(日曜日以外)",
+          parking: "あり",
+          phone: "0480-62-6307",
+          image: "shopimg/roja-su.webp",
+        },
+        {
+          name: "KAZO ケンゾー",
+          x: 940,
+          y: 630,
+          type: "market",
+          hours: "9時00分～20時30分",
+          parking: "あり",
+          phone: "0480-61-0343",
+          image: "shopimg/Kenzo.webp",
+        },
+        {
+          name: "ヤオコー 加須店",
+          x: 220,
+          y: 737,
+          type: "market",
+          hours: "9時00分～21時45分",
+          parking: "あり",
+          phone: "0480-53-3114",
+          image: "shopimg/yaoko.webp",
+        },
+        {
+          name: "ドラッグストアコスモス 久下店",
+          x: 2625,
+          y: 1231,
+          type: "pharmacy",
+          hours: "10時00分～21時00分",
+          parking: "あり",
+          phone: "0480-53-9050",
+          image: "shopimg/cosmos.webp",
+        },
+        {
+          name: "ウエルシア加須久下店",
+          x: 2195,
+          y: 854,
+          type: "pharmacy",
+          hours: "9時00分～0時00分",
+          parking: "あり",
+          phone: "0480-67-7003",
+          image: "shopimg/welcia.webp",
+        },
+        {
+          name: "ドラッグストアコスモス 加須浜町店",
+          x: 1768,
+          y: 635,
+          type: "pharmacy",
+          hours: "10時00分～21時00分",
+          parking: "あり",
+          phone: "0480-53-5855",
+          image: "shopimg/cosmos.webp",
+        },
+        {
+          name: "ドラッグストアセキ 加須店",
+          x: 1315,
+          y: 380,
+          type: "pharmacy",
+          hours: "9時00分～23時00分",
+          parking: "あり",
+          phone: "0480-62-8068",
+          image: "shopimg/seki.webp",
+        },
+        {
+          name: "ドラッグセイムス 加須東栄店",
+          x: 1465,
+          y: 866,
+          type: "pharmacy",
+          hours: "8時00分～21時45分",
+          parking: "あり",
+          phone: "0480-63-1551",
+          image: "shopimg/seims.webp",
+        },
+        {
+          name: "クスリのアオキ 久下店",
+          x: 1943,
+          y: 1615,
+          type: "pharmacy",
+          hours: "9時00分～22時00分",
+          parking: "あり",
+          phone: "0480-48-7446",
+          image: "shopimg/kusurinoaoki.webp",
+        },
+        {
+          name: "カワチ薬局 加須調剤",
+          x: 1998,
+          y: 2277,
+          type: "pharmacy",
+          hours: "9時00分～19時00分(日曜日定休)",
+          parking: "あり",
+          phone: "0480-7-3221",
+          image: "shopimg/kawachi.webp",
+        },
+        {
+          name: "ウエルシア加須店",
+          x: 180,
+          y: 760,
+          type: "pharmacy",
+          hours: "9時00分～23時00分",
+          parking: "あり",
+          phone: "0480-63-0308",
+          image: "shopimg/welcia.webp",
+        },
+        {
+          name: "コインランドリー/ピエロ久下店",
+          x: 2968,
+          y: 702,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0120-172-480",
+          image: "shopimg/piero.webp",
+        },
+        {
+          name: "ランドリーカーサ とりせん加須浜町店",
+          x: 1836,
+          y: 612,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "03-6630-2632",
+          image: "shopimg/coinlaundrytorisen.webp",
+        },
+        {
+          name: "コインランドリー TipTop",
+          x: 1729,
+          y: 844,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-61-0221",
+          image: "shopimg/coin.webp",
+        },
+        {
+          name: "コインランドリープードル",
+          x: 1970,
+          y: 1258,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "050-1460-8834",
+          image: "shopimg/pu-doru.webp",
+        },
+        {
+          name: "コインランドリー 洗いまっせ 乾きまっせ",
+          x: 2329,
+          y: 2325,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "なし",
+          image: "shopimg/araimasse.webp",
+        },
+        {
+          name: "しゃぼん 加須店",
+          x: 818,
+          y: 50,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "なし",
+          image: "shopimg/shabon.webp",
+        },
+        {
+          name: "コインランドリー ドルフィン 加須店",
+          x: 720,
+          y: 600,
+          type: "laundry",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "なし",
+          image: "shopimg/dolphinkazo.webp",
+        },
+        {
+          name: "ENEOS Dr.Driveセルフ花崎店",
+          x: 3021,
+          y: 1704,
+          type: "gs",
+          hours: "24時間営業",
+          parking: "あり",
+          phone: "0480-65-6333",
+          image: "shopimg/eneos.webp",
+        },
+        {
+          name: "丸紅エネルギー / (株)カトウコーポレーション セルフ加須西SS",
+          x: 1965,
+          y: 2480,
+          type: "gs",
+          hours: "7時00分～21時00分",
+          parking: "あり",
+          phone: "0480-76-2070",
+          image: "shopimg/katougs.webp",
+        },
+        {
+          name: "apollostation セルフ加須市役所前SS",
+          x: 870,
+          y: 130,
+          type: "gs",
+          hours: "4時00分～3時00分",
+          parking: "あり",
+          phone: "0480-61-8881",
+          image: "shopimg/idemitsu.webp",
+        },
+      ];
+
+      const markersClusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 40,
+        disableClusteringAtZoom: 1,
+      });
+      map.addLayer(markersClusterGroup);
+
+      const allMarkers = [];
+
+      function openBottomSheet(shop, markerY, markerX) {
+        const bsContent = document.getElementById("bs-content");
+
+        let html = `<div class="shop-header">`;
+        if (shop.image) {
+          html += `<img src="${shop.image}" class="shop-image" loading="lazy" alt="お店の写真">`;
+        }
+
+        html += `<div class="shop-title-area">
+                   <h2 class="shop-title">${shop.name}</h2>
+                   <div class="shop-info-row">
+                     <div class="shop-info-icon">🕒</div>
+                     <div>${shop.hours}</div>
+                   </div>
+                   <div class="shop-info-row">
+                     <div class="shop-info-icon">🅿️</div>
+                     <div>駐車場: ${shop.parking}</div>
+                   </div>
+                   <div class="shop-info-row">
+                     <div class="shop-info-icon">☎️</div>
+                     <div><a href="tel:${shop.phone}" style="color:#0056b3;">${shop.phone}</a></div>
+                   </div>
+                 </div></div>`;
+
+        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.name + " 加須市")}`;
+
+        html += `<div class="button-container">`;
+        if (shop.url) {
+          html += `<a href="${shop.url}" target="_blank" class="shop-link">🌐 公式</a>`;
+        }
+        html += `<a href="${googleMapsUrl}" target="_blank" class="shop-link google-btn">🗺️ マップ</a>`;
+        // ↓ここを追加（シェアボタン）
+        html += `<button onclick="shareShop('${shop.name}', '${googleMapsUrl}')" class="shop-link share-btn">📤 シェア</button>`;
+        html += `</div>`;
+
+        bsContent.innerHTML = html;
+        document.getElementById("bottom-sheet").classList.add("active");
+
+        map.panTo([markerY - 120, markerX], { animate: true, duration: 0.5 });
+      }
+
+      function closeBottomSheet() {
+        document.getElementById("bottom-sheet").classList.remove("active");
+      }
+
+      shops.forEach((shop) => {
+        const y = mapHeight - shop.y;
+        const x = shop.x;
+        const type = (shop.type || "restaurant").toLowerCase();
+
+        const marker = L.marker([y, x], {
+          icon: icons[type] || icons.restaurant,
+        });
+        marker.shopType = type;
+
+        marker.on("click", function (e) {
+          L.DomEvent.stopPropagation(e);
+
+          const inner = this.getElement()?.querySelector(".marker-inner");
+          if (inner) {
+            inner.style.transition = "transform 0.15s ease";
+            inner.style.transform = "scale(1.3)";
+            setTimeout(() => {
+              inner.style.transform = "scale(0.90)";
+            }, 100);
+            setTimeout(() => {
+              inner.style.transform = "scale(1)";
+            }, 200);
+          }
+
+          openBottomSheet(shop, y, x);
+        });
+
+        allMarkers.push(marker);
+      });
+
+      function updateFilters() {
+        markersClusterGroup.clearLayers();
+        const checkedTypes = Array.from(
+          document.querySelectorAll(
+            '#top-filter-bar input[type="checkbox"]:checked',
+          ),
+        ).map((cb) => cb.value);
+        const activeMarkers = allMarkers.filter((marker) =>
+          checkedTypes.includes(marker.shopType),
+        );
+        markersClusterGroup.addLayers(activeMarkers);
+        closeBottomSheet();
+      }
+
+      updateFilters();
+
+      document
+        .querySelectorAll('#top-filter-bar input[type="checkbox"]')
+        .forEach((checkbox) => {
+          checkbox.addEventListener("change", updateFilters);
+        });
+    </script>
+  </body>
+</html>
